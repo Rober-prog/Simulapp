@@ -1,51 +1,45 @@
 function exportarFichaAlumno() {
     if (!window.alumnoSeleccionado) {
-        alert('Error: No hay alumno seleccionado');
+        alert('No hay alumno seleccionado');
         return;
     }
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    doc.setFontSize(16);
-    doc.text(`Ficha de: ${window.alumnoSeleccionado.nombre} ${window.alumnoSeleccionado.apellido}`, 20, 20);
-    doc.text(`Número: ${window.alumnoSeleccionado.numero}`, 20, 30);
+    // Generar contenido del PDF
+    doc.setFontSize(18);
+    doc.text("Ficha del Alumno", 20, 20);
 
-    let y = 50;
+    const alumno = window.alumnoSeleccionado;
+    doc.setFontSize(12);
+    doc.text(`Nombre: ${alumno.nombre} ${alumno.apellido}`, 20, 40);
+    doc.text(`Número: ${alumno.numero}`, 20, 50);
+
     doc.setFontSize(14);
-    doc.text("Simulacros Realizados", 20, y);
+    doc.text("Simulacros:", 20, 70);
+    let y = 80;
+    alumno.simulacros.forEach((sim, i) => {
+        const fecha = new Date(sim.fecha);
+        doc.text(`${i + 1}. ${fecha.toLocaleDateString()} - ${sim.resultado || 'Resultado desconocido'}`, 20, y);
+        y += 10;
+    });
 
-    y += 10;
-
-    if (window.alumnoSeleccionado.simulacros.length === 0) {
-        doc.setFontSize(12);
-        doc.text("No hay simulacros registrados", 20, y);
-    } else {
-        window.alumnoSeleccionado.simulacros.forEach((simulacro, i) => {
-            const fecha = new Date(simulacro.fecha);
-            doc.setFontSize(12);
-            doc.text(`${i + 1}. Fecha: ${fecha.toLocaleDateString()} - Resultado: ${simulacro.resultado || 'APTO/NO APTO'}`, 20, y);
-            y += 10;
-        });
-    }
-
-    // Convertir a blob y mostrar en WebView
+    // Crear blob y simular descarga en WebView
     doc.output('blob').then(function (blob) {
         const blobUrl = URL.createObjectURL(blob);
-        const iframe = document.createElement('iframe');
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.src = blobUrl;
 
-        const nuevaVentana = window.open();
-        if (nuevaVentana) {
-            nuevaVentana.document.body.style.margin = '0';
-            nuevaVentana.document.body.appendChild(iframe);
-        } else {
-            alert("No se pudo abrir el PDF. Asegúrate de que tu WebView permite ventanas emergentes.");
-        }
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `Ficha_${alumno.apellido}_${alumno.nombre}.pdf`;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
     });
 }
 
 window.exportarFichaAlumno = exportarFichaAlumno;
+
 
