@@ -105,7 +105,7 @@ function exportarFichaAlumno() {
 
     const pdfBase64 = doc.output('datauristring').split(',')[1];
 if (window.AndroidInterface && AndroidInterface.savePDF) {
-    AndroidInterface.savePDF(pdfBase64, `Ficha_${window.alumnoSeleccionado.apellido}_${window.alumnoSeleccionado.nombre}.pdf`);
+   Android.saveBase64Pdf(pdfBase64, `Ficha_${window.alumnoSeleccionado.apellido}_${window.alumnoSeleccionado.nombre}.pdf`);
 } else {
     alert("No se pudo guardar el PDF: AndroidInterface no disponible");
 }
@@ -281,7 +281,7 @@ function exportarInformeSimulacro() {
     const fecha = fechaSimulacro.toISOString().split('T')[0];
    const pdfBase64 = doc.output('datauristring').split(',')[1];
 if (window.AndroidInterface && AndroidInterface.savePDF) {
-    AndroidInterface.savePDF(pdfBase64, `Ficha_${window.alumnoSeleccionado.apellido}_${window.alumnoSeleccionado.nombre}.pdf`);
+    Android.saveBase64Pdf(pdfBase64, `Ficha_${window.alumnoSeleccionado.apellido}_${window.alumnoSeleccionado.nombre}.pdf`);
 } else {
     alert("No se pudo guardar el PDF: AndroidInterface no disponible");
 }
