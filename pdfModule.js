@@ -103,7 +103,13 @@ function exportarFichaAlumno() {
         doc.text(`Página ${i} de ${totalPaginas}`, 105, 290, { align: 'center' });
     }
 
-    doc.save(`Ficha_${window.alumnoSeleccionado.apellido}_${window.alumnoSeleccionado.nombre}.pdf`);
+    const pdfBase64 = doc.output('datauristring').split(',')[1];
+if (window.AndroidInterface && AndroidInterface.savePDF) {
+    AndroidInterface.savePDF(pdfBase64, `Ficha_${window.alumnoSeleccionado.apellido}_${window.alumnoSeleccionado.nombre}.pdf`);
+} else {
+    alert("No se pudo guardar el PDF: AndroidInterface no disponible");
+}
+
 }
 
 function exportarInformeSimulacro() {
@@ -273,7 +279,13 @@ function exportarInformeSimulacro() {
     }
 
     const fecha = fechaSimulacro.toISOString().split('T')[0];
-    doc.save(`Simulacro_${alumno.apellido}_${fecha}.pdf`);
+   const pdfBase64 = doc.output('datauristring').split(',')[1];
+if (window.AndroidInterface && AndroidInterface.savePDF) {
+    AndroidInterface.savePDF(pdfBase64, `Ficha_${window.alumnoSeleccionado.apellido}_${window.alumnoSeleccionado.nombre}.pdf`);
+} else {
+    alert("No se pudo guardar el PDF: AndroidInterface no disponible");
+}
+
 }
 
 // Exportar funciones globalmente
