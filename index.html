@@ -1,30 +1,13 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoEscuela App</title>
+    <title>SimulApp</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <script type="importmap">
-    {
-      "imports": {
-        "./alumnosModule.js": "./alumnosModule.js",
-        "./alumnosControlador.js": "./alumnosControlador.js", 
-        "./alumnosLista.js": "./alumnosLista.js",
-        "./alumnosVista.js": "./alumnosVista.js",
-        "./candidatosModule.js": "./candidatosModule.js",
-        "./faltasModule.js": "./faltasModule.js",
-        "./catalogoFaltas.js": "./catalogoFaltas.js",
-        "./simulacroModule.js": "./simulacroModule.js",
-        "./db.js": "./db.js",
-        "./navigation.js": "./navigation.js",
-        "./ui.js": "./ui.js",
-        "./pdfModule.js": "./pdfModule.js"
-      }
-    }
-    </script>
 </head>
 <body>
     <!-- PANTALLA DE BIENVENIDA -->
@@ -340,15 +323,15 @@
             </div>
         </div>
     </div>
-
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="catalogoFaltas.js"></script>
+    <!-- AL FINAL DEL BODY: SCRIPTS -->
+    <script src="catalogoFaltas.js"></script>
     <script src="faltasModule.js"></script>
     <script src="navigation.js"></script>
     <script src="db.js"></script>
     <script src="ui.js"></script>
     <script src="alumnosModule.js"></script>
     <script src="pdfModule.js"></script>
-    <script src="app.js"></script>
     <script src="simulacroModule.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
