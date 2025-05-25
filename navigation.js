@@ -40,7 +40,9 @@ function volverPantallaAnterior() {
     }
 }
 
-// Hacer funciones globales
-window.mostrarPantalla = mostrarPantalla;
-window.volverPantallaAnterior = volverPantallaAnterior;
-window.historialPantallas = historialPantallas;
+// Export the navigation functions
+export {
+    mostrarPantalla,
+    volverPantallaAnterior,
+    historialPantallas
+};
