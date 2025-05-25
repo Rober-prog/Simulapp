@@ -628,3 +628,12 @@ export {
     guardarObservacionesSimulacro,
     simulacroActual
 };
+window.finalizarSimulacroDesdeAndroid = function() {
+    if (window.simulacroEnCurso) {
+        // Finaliza el simulacro usando tu función
+        finalizarSimulacro();
+        window.simulacroEnCurso = false;
+        console.log("Simulacro finalizado desde Android");
+    }
+};
+
