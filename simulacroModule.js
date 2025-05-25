@@ -55,6 +55,8 @@ function iniciarSimulacro() {
         duracion: '00:00:00',
         faltas: [],
         observaciones: '' // Initialize empty observations
+        window.simulacroEnCurso = true;
+
     };
     
     // Make simulacroActual globally accessible
@@ -306,6 +308,8 @@ function actualizarContadoresFaltas() {
 function finalizarSimulacro() {
     if (!confirm('¿Estás seguro de finalizar el simulacro?')) {
         return;
+        window.simulacroEnCurso = false;
+
     }
     
     detenerCronometro();
