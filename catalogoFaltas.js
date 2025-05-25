@@ -10,7 +10,7 @@ const FALTAS_PREDETERMINADAS = [
     { id: 'l8', codigo: '2.6', descripcion: 'Otros sistemas de seguridad', tipo: 'leve'},
     { id: 'l9', codigo: '3.1', descripcion: 'Incorporarse sin observar', tipo: 'leve'},
     { id: 'l10', codigo: '3.2', descripcion: 'Incorporarse sin señalizar', tipo: 'leve'},
-    { id: 'l11', codigo: '3.2', descripcion: 'Incorporarse señalizando sin antelación', tipo: 'leve'},
+    { id: 'l11', codigo: '3.2', descripcion: 'Icorprorarse señalizando sin antelación', tipo: 'leve'},
     { id: 'l12', codigo: '3.3', descripcion: 'No incorporarse a tiempo según tráfico', tipo: 'leve'},
     { id: 'l13', codigo: '3.3', descripcion: 'Uso inadecuado de carril de aceleración', tipo: 'leve'},
     { id: 'l14', codigo: '4.1', descripcion: 'No usar carril derecho', tipo: 'leve'},
