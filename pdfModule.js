@@ -118,7 +118,15 @@ function exportarFichaAlumno() {
     }
     
     // Guardar PDF
-    doc.save(`Ficha_${window.alumnoSeleccionado.apellido}_${window.alumnoSeleccionado.nombre}.pdf`);
+    const nombreArchivo = `Ficha_${window.alumnoSeleccionado.apellido}_${window.alumnoSeleccionado.nombre}.pdf`;
+const pdfBase64 = doc.output('datauristring');
+
+if (window.AndroidInterface && window.AndroidInterface.guardarPDF) {
+    window.AndroidInterface.guardarPDF(nombreArchivo, pdfBase64);
+} else {
+    doc.save(nombreArchivo);
+}
+
 }
 
 function exportarInformeSimulacro() {
@@ -353,7 +361,15 @@ function exportarInformeSimulacro() {
     
     // Guardar PDF
     const fecha = fechaSimulacro.toISOString().split('T')[0];
-    doc.save(`Simulacro_${alumno.apellido}_${fecha}.pdf`);
+    const nombreArchivo = `Simulacro_${alumno.apellido}_${fecha}.pdf`;
+const pdfBase64 = doc.output('datauristring');
+
+if (window.AndroidInterface && window.AndroidInterface.guardarPDF) {
+    window.AndroidInterface.guardarPDF(nombreArchivo, pdfBase64);
+} else {
+    doc.save(nombreArchivo);
+}
+
 }
 
 // Make the functions available globally
