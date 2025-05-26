@@ -113,25 +113,15 @@ function importarBD(jsonData) {
 }
 
 // Hacer funciones disponibles globalmente (para WebView)
+window.inicializarBD = inicializarBD;
 window.obtenerAlumnoPorId = obtenerAlumnoPorId;
 window.obtenerAlumnosBD = obtenerAlumnosBD;
 window.guardarSimulacroBD = guardarSimulacroBD;
 window.guardarAlumnoBD = guardarAlumnoBD;
+window.guardarAlumnosBD = guardarAlumnosBD;
 window.eliminarAlumnoBD = eliminarAlumnoBD;
 window.eliminarSimulacroBD = eliminarSimulacroBD;
 window.exportarBD = exportarBD;
 window.importarBD = importarBD;
 
-// Exportar todas las funciones (para posibles usos en otros módulos)
-export {
-    inicializarBD,
-    obtenerAlumnosBD,
-    guardarAlumnosBD,
-    guardarAlumnoBD,
-    obtenerAlumnoPorId,
-    eliminarAlumnoBD,
-    guardarSimulacroBD,
-    eliminarSimulacroBD,
-    exportarBD,
-    importarBD
-};
+
