@@ -207,14 +207,9 @@ document.head.appendChild(estilosUI);
 // Make functions available globally
 window.mostrarNotificacion = mostrarNotificacion;
 window.confirmarAccion = confirmarAccion;
+window.crearElementoLista = crearElementoLista;
+window.validarCampo = validarCampo;
+window.formatearFecha =  formatearFecha;
+window.formatearHora =  formatearHora;
+window.animarTransicion =  animarTransicion;
 
-// Export functions for other modules to import
-export {
-    mostrarNotificacion,
-    confirmarAccion,
-    crearElementoLista,
-    validarCampo,
-    formatearFecha,
-    formatearHora,
-    animarTransicion
-};
