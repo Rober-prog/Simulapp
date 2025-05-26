@@ -1,9 +1,13 @@
 // CONTROLADOR DE ALUMNOS
 // Logic for student data manipulation
 
-import { mostrarNotificacion, confirmarAccion } from './ui.js';
-import { obtenerAlumnoPorId, guardarAlumnoBD, eliminarAlumnoBD } from './db.js';
-import { mostrarPantalla } from './navigation.js';
+// Asegurarse de que las dependencias estén disponibles globalmente
+window.mostrarNotificacion = window.mostrarNotificacion || function() { console.log("mostrarNotificacion not loaded yet"); };
+window.confirmarAccion = window.confirmarAccion || function() { console.log("confirmarAccion not loaded yet"); };
+window.obtenerAlumnoPorId = window.obtenerAlumnoPorId || function() { console.log("obtenerAlumnoPorId not loaded yet"); };
+window.guardarAlumnoBD = window.guardarAlumnoBD || function() { console.log("guardarAlumnoBD not loaded yet"); };
+window.eliminarAlumnoBD = window.eliminarAlumnoBD || function() { console.log("eliminarAlumnoBD not loaded yet"); };
+window.mostrarPantalla = window.mostrarPantalla || function() { console.log("mostrarPantalla not loaded yet"); };
 
 // Function to save a student (new or edit)
 function guardarAlumno() {
@@ -12,7 +16,7 @@ function guardarAlumno() {
     const apellido = document.getElementById('apellido-alumno').value.trim();
     
     if (!numero || !nombre || !apellido) {
-        mostrarNotificacion('Por favor, complete todos los campos', 'advertencia');
+        window.mostrarNotificacion('Por favor, complete todos los campos', 'advertencia');
         return;
     }
     
@@ -20,12 +24,11 @@ function guardarAlumno() {
     const modo = btnGuardar.dataset.modo || 'nuevo';
     
     if (modo === 'edicion') {
-        // Editar alumno existente
         const id = btnGuardar.dataset.id;
-        const alumnoExistente = obtenerAlumnoPorId(id);
+        const alumnoExistente = window.obtenerAlumnoPorId(id);
         
         if (!alumnoExistente) {
-            mostrarNotificacion('Error al actualizar: alumno no encontrado', 'error');
+            window.mostrarNotificacion('Error al actualizar: alumno no encontrado', 'error');
             return;
         }
         
@@ -36,10 +39,9 @@ function guardarAlumno() {
             apellido
         };
         
-        guardarAlumnoBD(alumnoActualizado);
-        mostrarNotificacion('Alumno actualizado correctamente', 'exito');
+        window.guardarAlumnoBD(alumnoActualizado);
+        window.mostrarNotificacion('Alumno actualizado correctamente', 'exito');
     } else {
-        // Guardar nuevo alumno
         const alumno = {
             id: Date.now().toString(),
             numero,
@@ -48,32 +50,29 @@ function guardarAlumno() {
             simulacros: []
         };
         
-        guardarAlumnoBD(alumno);
-        mostrarNotificacion('Alumno guardado correctamente', 'exito');
+        window.guardarAlumnoBD(alumno);
+        window.mostrarNotificacion('Alumno guardado correctamente', 'exito');
     }
     
-    // Limpiar campos
     document.getElementById('numero-alumno').value = '';
     document.getElementById('nombre-alumno').value = '';
     document.getElementById('apellido-alumno').value = '';
     
-    mostrarPantalla('pantalla-menu');
+    window.mostrarPantalla('pantalla-menu');
 }
 
 // Function to edit a student
 function editarAlumno(id) {
-    const alumno = obtenerAlumnoPorId(id);
+    const alumno = window.obtenerAlumnoPorId(id);
     if (!alumno) {
-        mostrarNotificacion('No se pudo encontrar el alumno', 'error');
+        window.mostrarNotificacion('No se pudo encontrar el alumno', 'error');
         return;
     }
     
-    // Rellenar el formulario con los datos del alumno
     document.getElementById('numero-alumno').value = alumno.numero;
     document.getElementById('nombre-alumno').value = alumno.nombre;
     document.getElementById('apellido-alumno').value = alumno.apellido;
     
-    // Cambiar el botón guardar para indicar que es edición
     const btnGuardar = document.getElementById('btn-guardar-alumno');
     btnGuardar.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
@@ -82,24 +81,22 @@ function editarAlumno(id) {
     btnGuardar.dataset.modo = 'edicion';
     btnGuardar.dataset.id = id;
     
-    // Mostrar la pantalla de añadir alumno (ahora editar)
-    mostrarPantalla('pantalla-anadir-alumno');
+    window.mostrarPantalla('pantalla-anadir-alumno');
 }
 
 // Function to confirm and delete a student
 function confirmarEliminarAlumno(id) {
-    const alumno = obtenerAlumnoPorId(id);
+    const alumno = window.obtenerAlumnoPorId(id);
     if (!alumno) {
-        mostrarNotificacion('No se pudo encontrar el alumno', 'error');
+        window.mostrarNotificacion('No se pudo encontrar el alumno', 'error');
         return;
     }
     
-    confirmarAccion(`¿Estás seguro de eliminar al alumno ${alumno.nombre} ${alumno.apellido}?`).then(confirmado => {
+    window.confirmarAccion(`¿Estás seguro de eliminar al alumno ${alumno.nombre} ${alumno.apellido}?`).then(confirmado => {
         if (confirmado) {
-            eliminarAlumnoBD(id);
-            mostrarNotificacion('Alumno eliminado correctamente', 'exito');
+            window.eliminarAlumnoBD(id);
+            window.mostrarNotificacion('Alumno eliminado correctamente', 'exito');
             
-            // Reload the student list
             const cargarListaAlumnos = window.cargarListaAlumnos || (() => {
                 console.error('Function cargarListaAlumnos not found');
             });
@@ -112,9 +109,3 @@ function confirmarEliminarAlumno(id) {
 window.guardarAlumno = guardarAlumno;
 window.editarAlumno = editarAlumno;
 window.confirmarEliminarAlumno = confirmarEliminarAlumno;
-
-export {
-    guardarAlumno,
-    editarAlumno,
-    confirmarEliminarAlumno
-};
