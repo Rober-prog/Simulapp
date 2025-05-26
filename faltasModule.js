@@ -1,68 +1,56 @@
 // GESTIÓN DE FALTAS 
 // Module for managing faults configuration
 
-import { mostrarNotificacion, confirmarAccion } from './ui.js';
-import { mostrarPantalla } from './navigation.js';
-import {
-    cargarCatalogoFaltas,
-    agregarFalta,
-    actualizarFalta,
-    eliminarFalta,
-    ordenarFaltas
-} from './catalogoFaltas.js';
+// Las funciones dependientes de otros módulos se llaman a través de window
+// Ejemplo: window.mostrarNotificacion, window.confirmarAccion, etc.
 
-// Variables to track editing state
-let modoEdicion = false;
-let faltaEditandoId = null;
+// Variables para el estado de edición
+window.modoEdicion = false;
+window.faltaEditandoId = null;
 
-// Initialize the fault management module
-function inicializarGestionFaltas() {
-    // Set up event listeners
-    document.getElementById('btn-agregar-falta').addEventListener('click', validarYGuardarFalta);
-    document.getElementById('btn-cancelar-edicion').addEventListener('click', cancelarEdicion);
-    
-    // Set up sorting buttons
+// Inicializar el módulo de gestión de faltas
+window.inicializarGestionFaltas = function () {
+    document.getElementById('btn-agregar-falta').addEventListener('click', window.validarYGuardarFalta);
+    document.getElementById('btn-cancelar-edicion').addEventListener('click', window.cancelarEdicion);
+
     document.getElementById('ordenar-tipo').addEventListener('click', () => {
-        ordenarYMostrarFaltas('tipo');
+        window.ordenarYMostrarFaltas('tipo');
     });
-    
+
     document.getElementById('ordenar-codigo').addEventListener('click', () => {
-        ordenarYMostrarFaltas('codigo');
+        window.ordenarYMostrarFaltas('codigo');
     });
-    
-    // Load initial faults list
-    cargarYMostrarFaltas();
+
+    window.cargarYMostrarFaltas();
 }
 
-// Load and display the list of faults
-function cargarYMostrarFaltas() {
-    const faltas = cargarCatalogoFaltas();
-    mostrarListaFaltas(faltas);
+// Cargar y mostrar la lista de faltas
+window.cargarYMostrarFaltas = function () {
+    const faltas = window.cargarCatalogoFaltas();
+    window.mostrarListaFaltas(faltas);
 }
 
-// Order and display faults
-function ordenarYMostrarFaltas(criterio) {
-    const faltas = ordenarFaltas(criterio);
-    mostrarListaFaltas(faltas);
-    
-    // Update active button style
+// Ordenar y mostrar faltas
+window.ordenarYMostrarFaltas = function (criterio) {
+    const faltas = window.ordenarFaltas(criterio);
+    window.mostrarListaFaltas(faltas);
+
     document.querySelectorAll('.btn-ordenar').forEach(btn => {
         btn.classList.remove('activo');
     });
     document.getElementById(`ordenar-${criterio}`).classList.add('activo');
 }
 
-// Display the list of faults
-function mostrarListaFaltas(faltas) {
+// Mostrar la lista de faltas
+window.mostrarListaFaltas = function (faltas) {
     const listaFaltas = document.getElementById('lista-config-faltas');
     listaFaltas.innerHTML = '';
-    
+
     if (faltas.length === 0) {
         listaFaltas.innerHTML = '<p class="no-resultados">No hay faltas configuradas</p>';
         return;
     }
-    
-    // Add select all checkbox event listener
+
     const selectAllCheckbox = document.getElementById('seleccionar-todas-faltas');
     selectAllCheckbox.checked = faltas.every(f => f.activa !== false);
     selectAllCheckbox.addEventListener('change', (e) => {
@@ -71,34 +59,33 @@ function mostrarListaFaltas(faltas) {
             const checkbox = document.querySelector(`input[data-id="${falta.id}"]`);
             if (checkbox) {
                 checkbox.checked = newValue;
-                actualizarEstadoFalta(falta.id, newValue);
+                window.actualizarEstadoFalta(falta.id, newValue);
             }
         });
     });
-    
-    // Group faults by type
+
     const tiposFalta = ['leve', 'deficiente', 'eliminatoria'];
-    
+
     tiposFalta.forEach(tipo => {
         const faltasPorTipo = faltas.filter(falta => falta.tipo === tipo);
-        
+
         if (faltasPorTipo.length > 0) {
             const seccionTipo = document.createElement('div');
             seccionTipo.className = 'seccion-tipo-falta';
-            
+
             const headerTipo = document.createElement('h3');
             headerTipo.className = `header-tipo-${tipo}`;
             headerTipo.textContent = tipo.charAt(0).toUpperCase() + tipo.slice(1) + 's';
             seccionTipo.appendChild(headerTipo);
-            
+
             faltasPorTipo.forEach(falta => {
                 const itemFalta = document.createElement('div');
                 itemFalta.className = `item-lista falta-item-config tipo-${falta.tipo}`;
-                
+
                 if (falta.activa === false) {
                     itemFalta.classList.add('falta-inactiva');
                 }
-                
+
                 itemFalta.innerHTML = `
                     <div class="item-contenido">
                         <h4>${falta.codigo} - ${falta.descripcion}</h4>
@@ -119,42 +106,40 @@ function mostrarListaFaltas(faltas) {
                         </button>
                     </div>
                 `;
-                
+
                 const checkbox = itemFalta.querySelector(`input[data-id="${falta.id}"]`);
                 checkbox.addEventListener('change', (e) => {
-                    actualizarEstadoFalta(falta.id, e.target.checked);
+                    window.actualizarEstadoFalta(falta.id, e.target.checked);
                     if (!e.target.checked) {
                         selectAllCheckbox.checked = false;
                     } else {
-                        selectAllCheckbox.checked = faltas.every(f => 
+                        selectAllCheckbox.checked = faltas.every(f =>
                             document.querySelector(`input[data-id="${f.id}"]`)?.checked
                         );
                     }
                 });
-                
-                // Add existing event listeners for edit and delete buttons
+
                 const btnEditar = itemFalta.querySelector('.btn-editar');
                 btnEditar.addEventListener('click', () => {
-                    prepararEdicionFalta(falta);
+                    window.prepararEdicionFalta(falta);
                 });
-                
+
                 const btnEliminar = itemFalta.querySelector('.btn-eliminar');
                 btnEliminar.addEventListener('click', () => {
-                    confirmarEliminarFalta(falta.id);
+                    window.confirmarEliminarFalta(falta.id);
                 });
-                
+
                 seccionTipo.appendChild(itemFalta);
             });
-            
+
             listaFaltas.appendChild(seccionTipo);
         }
     });
 }
 
-// Prepare the form for editing a fault
-function prepararEdicionFalta(falta) {
+// Preparar la edición de una falta
+window.prepararEdicionFalta = function (falta) {
     try {
-        // Add null checks for all form elements
         const codigoInput = document.getElementById('codigo-falta');
         const descripcionInput = document.getElementById('descripcion-falta');
         const tipoSelect = document.getElementById('tipo-falta');
@@ -162,135 +147,121 @@ function prepararEdicionFalta(falta) {
         const btnCancelar = document.getElementById('btn-cancelar-edicion');
         const formHeader = document.querySelector('.form-header h3');
 
-        // Validate that all required elements exist
         if (!codigoInput || !descripcionInput || !tipoSelect || !btnAgregar || !btnCancelar || !formHeader) {
             throw new Error('Elementos del formulario no encontrados');
         }
 
-        // Update form values
         codigoInput.value = falta.codigo || '';
         descripcionInput.value = falta.descripcion || '';
         tipoSelect.value = falta.tipo || 'leve';
-        
-        // Update button and form state
+
         btnAgregar.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
             Actualizar Falta
         `;
         btnCancelar.style.display = 'inline-block';
         formHeader.textContent = 'Editar Falta';
-        
-        // Set editing mode
-        modoEdicion = true;
-        faltaEditandoId = falta.id;
-        
-        // Try-catch for scrolling
+
+        window.modoEdicion = true;
+        window.faltaEditandoId = falta.id;
+
         const formulario = document.querySelector('.formulario-faltas');
         if (formulario) {
             formulario.scrollIntoView({ behavior: 'smooth' });
         }
-
     } catch (error) {
         console.error('Error al preparar edición:', error);
-        mostrarNotificacion('Error al preparar la edición de la falta', 'error');
+        window.mostrarNotificacion('Error al preparar la edición de la falta', 'error');
     }
 }
 
-// Cancel the editing mode
-function cancelarEdicion() {
+// Cancelar edición
+window.cancelarEdicion = function () {
     document.getElementById('codigo-falta').value = '';
     document.getElementById('descripcion-falta').value = '';
     document.getElementById('tipo-falta').value = 'leve';
-    
-    // Reset the button and form state
+
     document.getElementById('btn-agregar-falta').textContent = 'Agregar Falta';
     document.getElementById('btn-cancelar-edicion').style.display = 'none';
     document.querySelector('.form-header h3').textContent = 'Añadir Nueva Falta';
-    
-    // Reset editing mode
-    modoEdicion = false;
-    faltaEditandoId = null;
+
+    window.modoEdicion = false;
+    window.faltaEditandoId = null;
 }
 
-// Validate and save a fault
-function validarYGuardarFalta() {
+// Validar y guardar falta
+window.validarYGuardarFalta = function () {
     const codigo = document.getElementById('codigo-falta').value.trim().toUpperCase();
     const descripcion = document.getElementById('descripcion-falta').value.trim();
     const tipo = document.getElementById('tipo-falta').value;
-    
-    // Validate inputs
+
     if (!codigo || !descripcion || !tipo) {
-        mostrarNotificacion('Por favor, complete todos los campos!', 'advertencia');
+        window.mostrarNotificacion('Por favor, complete todos los campos!', 'advertencia');
         return;
     }
-    
-    if (modoEdicion) {
-        // Update existing fault
+
+    if (window.modoEdicion) {
         const faltaActualizada = {
-            id: faltaEditandoId,
+            id: window.faltaEditandoId,
             codigo: codigo,
             descripcion: descripcion,
             tipo: tipo,
-            activa: true // Default to active when editing
+            activa: true
         };
-        
-        if (actualizarFalta(faltaActualizada)) {
-            mostrarNotificacion('Falta actualizada correctamente', 'exito');
-            cancelarEdicion();
-            cargarYMostrarFaltas();
+
+        if (window.actualizarFalta(faltaActualizada)) {
+            window.mostrarNotificacion('Falta actualizada correctamente', 'exito');
+            window.cancelarEdicion();
+            window.cargarYMostrarFaltas();
         } else {
-            mostrarNotificacion('Error al actualizar la falta', 'error');
+            window.mostrarNotificacion('Error al actualizar la falta', 'error');
         }
     } else {
-        // Add new fault
         const nuevaFalta = {
             codigo: codigo,
             descripcion: descripcion,
             tipo: tipo,
-            activa: true // Default to active for new faults
+            activa: true
         };
-        
-        agregarFalta(nuevaFalta);
-        mostrarNotificacion('Falta agregada correctamente', 'exito');
-        
-        // Clear form
+
+        window.agregarFalta(nuevaFalta);
+        window.mostrarNotificacion('Falta agregada correctamente', 'exito');
+
         document.getElementById('codigo-falta').value = '';
         document.getElementById('descripcion-falta').value = '';
-        
-        // Refresh the list
-        cargarYMostrarFaltas();
+
+        window.cargarYMostrarFaltas();
     }
 }
 
-// Confirm and delete a fault
-function confirmarEliminarFalta(id) {
-    confirmarAccion('¿Estás seguro de eliminar esta falta?').then(confirmado => {
+// Confirmar y eliminar falta
+window.confirmarEliminarFalta = function (id) {
+    window.confirmarAccion('¿Estás seguro de eliminar esta falta?').then(confirmado => {
         if (confirmado) {
-            eliminarFalta(id);
-            mostrarNotificacion('Falta eliminada correctamente', 'exito');
-            cargarYMostrarFaltas();
-            
-            // If we were editing this fault, cancel editing
-            if (modoEdicion && faltaEditandoId === id) {
-                cancelarEdicion();
+            window.eliminarFalta(id);
+            window.mostrarNotificacion('Falta eliminada correctamente', 'exito');
+            window.cargarYMostrarFaltas();
+
+            if (window.modoEdicion && window.faltaEditandoId === id) {
+                window.cancelarEdicion();
             }
         }
     });
 }
 
-// Add this new function to handle fault state updates
-function actualizarEstadoFalta(id, activa) {
+// Actualizar estado de una falta
+window.actualizarEstadoFalta = function (id, activa) {
     try {
         if (!id) throw new Error('ID de falta no válido');
-        
-        const faltas = cargarCatalogoFaltas();
+
+        const faltas = window.cargarCatalogoFaltas();
         const falta = faltas.find(f => f.id === id);
-        
+
         if (!falta) throw new Error('Falta no encontrada');
-        
+
         falta.activa = Boolean(activa);
         localStorage.setItem('catalogoFaltas', JSON.stringify(faltas));
-        
+
         const itemFalta = document.querySelector(`.falta-item-config:has(input[data-id="${id}"])`);
         if (itemFalta) {
             if (!activa) {
@@ -301,12 +272,6 @@ function actualizarEstadoFalta(id, activa) {
         }
     } catch (error) {
         console.error('Error al actualizar estado:', error);
-        mostrarNotificacion('Error al actualizar el estado de la falta', 'error');
+        window.mostrarNotificacion('Error al actualizar el estado de la falta', 'error');
     }
 }
-
-// Export functions for use in other modules
-export {
-    inicializarGestionFaltas,
-    cargarYMostrarFaltas
-};
