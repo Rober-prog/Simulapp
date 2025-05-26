@@ -1,8 +1,6 @@
 // actualizarEstadoFalta.js
 
-import React, { useState } from 'react';
-
-const actualizarEstadoFalta = (id, nuevoEstado, faltas, setFaltas) => {
+function actualizarEstadoFalta(id, nuevoEstado, faltas, setFaltasCallback) {
   try {
     if (!id || !nuevoEstado) {
       console.error('ID y nuevo estado son requeridos.');
@@ -13,10 +11,16 @@ const actualizarEstadoFalta = (id, nuevoEstado, faltas, setFaltas) => {
       falta.id === id ? { ...falta, estado: nuevoEstado } : falta
     );
 
-    setFaltas(nuevasFaltas);
+    if (typeof setFaltasCallback === 'function') {
+      setFaltasCallback(nuevasFaltas);
+    } else {
+      console.warn('No se ha proporcionado una función para actualizar el estado.');
+    }
   } catch (error) {
     console.error('Error al actualizar el estado de la falta:', error);
   }
-};
+}
 
-export default actualizarEstadoFalta;
+// Exportar en entorno sin módulos ES6 (WebView Android)
+window.actualizarEstadoFalta = actualizarEstadoFalta;
+
