@@ -1,13 +1,15 @@
 // LISTA DE ALUMNOS
 // Functions for displaying and filtering student lists
 
-import { obtenerAlumnosBD } from './db.js';
-import { mostrarFichaAlumno } from './alumnosVista.js';
-import { editarAlumno, confirmarEliminarAlumno } from './alumnosControlador.js';
+// Asegurarse de que las dependencias estén disponibles globalmente
+window.obtenerAlumnosBD = window.obtenerAlumnosBD || function() { console.log("obtenerAlumnosBD not loaded yet"); };
+window.mostrarFichaAlumno = window.mostrarFichaAlumno || function() { console.log("mostrarFichaAlumno not loaded yet"); };
+window.editarAlumno = window.editarAlumno || function() { console.log("editarAlumno not loaded yet"); };
+window.confirmarEliminarAlumno = window.confirmarEliminarAlumno || function() { console.log("confirmarEliminarAlumno not loaded yet"); };
 
 // Function to load the list of students
 function cargarListaAlumnos() {
-    const alumnos = obtenerAlumnosBD();
+    const alumnos = window.obtenerAlumnosBD();
     const listaAlumnos = document.getElementById('lista-alumnos');
     listaAlumnos.innerHTML = '';
     
@@ -25,7 +27,7 @@ function cargarListaAlumnos() {
 // Function to filter students by search term
 function filtrarAlumnos() {
     const textoBusqueda = document.getElementById('input-buscar').value.toLowerCase();
-    const alumnos = obtenerAlumnosBD();
+    const alumnos = window.obtenerAlumnosBD();
     const listaAlumnos = document.getElementById('lista-alumnos');
     listaAlumnos.innerHTML = '';
     
@@ -68,26 +70,25 @@ function crearElementoAlumno(alumno) {
     // Evento para mostrar ficha al hacer clic en el contenido
     const contenido = itemAlumno.querySelector('.item-contenido');
     contenido.addEventListener('click', () => {
-        mostrarFichaAlumno(alumno);
+        window.mostrarFichaAlumno(alumno);
     });
     
     // Eventos para los botones de editar y eliminar
     const btnEditar = itemAlumno.querySelector('.btn-editar');
     btnEditar.addEventListener('click', (e) => {
         e.stopPropagation();
-        editarAlumno(alumno.id);
+        window.editarAlumno(alumno.id);
     });
     
     const btnEliminar = itemAlumno.querySelector('.btn-eliminar');
     btnEliminar.addEventListener('click', (e) => {
         e.stopPropagation();
-        confirmarEliminarAlumno(alumno.id);
+        window.confirmarEliminarAlumno(alumno.id);
     });
     
     return itemAlumno;
 }
 
-export {
-    cargarListaAlumnos,
-    filtrarAlumnos
-};
+// Hacer funciones accesibles globalmente
+window.cargarListaAlumnos = cargarListaAlumnos;
+window.filtrarAlumnos = filtrarAlumnos;
