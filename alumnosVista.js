@@ -8,6 +8,7 @@ import { mostrarNotificacion } from './ui.js';
 
 // Global variable for selected student
 let alumnoSeleccionado = null;
+window.alumnoSeleccionado = null; // Asegura referencia global al cargar el script
 
 // Function to display student details
 function mostrarFichaAlumno(alumno) {
