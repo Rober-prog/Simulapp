@@ -108,6 +108,11 @@ function confirmarEliminarAlumno(id) {
     });
 }
 
+// Hacer funciones accesibles globalmente
+window.guardarAlumno = guardarAlumno;
+window.editarAlumno = editarAlumno;
+window.confirmarEliminarAlumno = confirmarEliminarAlumno;
+
 export {
     guardarAlumno,
     editarAlumno,
