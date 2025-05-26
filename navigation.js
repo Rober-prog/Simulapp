@@ -73,12 +73,7 @@ function reiniciarHistorial() {
 // Hacer las funciones accesibles globalmente
 window.mostrarPantalla = mostrarPantalla;
 window.volverPantallaAnterior = volverPantallaAnterior;
+window.historialpantallas = historialPantallas;
 window.reiniciarHistorial = reiniciarHistorial;
 
-// Exportar funciones (opcional para otros módulos)
-export {
-    mostrarPantalla,
-    volverPantallaAnterior,
-    historialPantallas,
-    reiniciarHistorial
-};
+
