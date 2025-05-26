@@ -1,5 +1,5 @@
 // Handles all timing related functionality
-export class TimeTracker {
+window.TimeTracker = class TimeTracker {
     constructor() {
         this.startTime = null;
         this.intervalId = null;
@@ -18,6 +18,7 @@ export class TimeTracker {
             const segundos = diferencia.getUTCSeconds().toString().padStart(2, '0');
             
             cronometroElement.textContent = `${horas}:${minutos}:${segundos}`;
+            window.simulacroActual = window.simulacroActual || {};
             window.simulacroActual.duracion = `${horas}:${minutos}:${segundos}`;
         }, 1000);
     }
@@ -43,4 +44,4 @@ export class TimeTracker {
             return { horas, minutos, segundos };
         }
     }
-}
+};
