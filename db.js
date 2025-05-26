@@ -3,9 +3,7 @@
 
 // Inicialización de la base de datos
 function inicializarBD() {
-    // Verificar si ya existe la base de datos
     if (!localStorage.getItem('alumnos')) {
-        // Inicializar con un array vacío
         localStorage.setItem('alumnos', JSON.stringify([]));
     }
 }
@@ -21,18 +19,15 @@ function guardarAlumnosBD(alumnos) {
 
 function guardarAlumnoBD(alumno) {
     const alumnos = obtenerAlumnosBD();
-    
-    // Verificar si ya existe por número
+
     const existente = alumnos.findIndex(a => a.numero === alumno.numero);
-    
+
     if (existente >= 0) {
-        // Actualizar alumno existente
         alumnos[existente] = { ...alumnos[existente], ...alumno };
     } else {
-        // Añadir nuevo alumno
         alumnos.push(alumno);
     }
-    
+
     guardarAlumnosBD(alumnos);
     return alumno;
 }
@@ -52,23 +47,24 @@ function eliminarAlumnoBD(id) {
 function guardarSimulacroBD(simulacro) {
     const alumnos = obtenerAlumnosBD();
     const indiceAlumno = alumnos.findIndex(a => a.id === simulacro.alumnoId);
-    
+
     if (indiceAlumno < 0) {
         console.error('No se encontró el alumno para guardar el simulacro');
         return null;
     }
-    
-    // Verificar si ya existe el simulacro
+
+    if (!alumnos[indiceAlumno].simulacros) {
+        alumnos[indiceAlumno].simulacros = [];
+    }
+
     const indiceSimulacro = alumnos[indiceAlumno].simulacros.findIndex(s => s.id === simulacro.id);
-    
+
     if (indiceSimulacro >= 0) {
-        // Actualizar simulacro existente
         alumnos[indiceAlumno].simulacros[indiceSimulacro] = simulacro;
     } else {
-        // Añadir nuevo simulacro
         alumnos[indiceAlumno].simulacros.push(simulacro);
     }
-    
+
     guardarAlumnosBD(alumnos);
     return simulacro;
 }
@@ -76,12 +72,12 @@ function guardarSimulacroBD(simulacro) {
 function eliminarSimulacroBD(alumnoId, simulacroId) {
     const alumnos = obtenerAlumnosBD();
     const indiceAlumno = alumnos.findIndex(a => a.id === alumnoId);
-    
+
     if (indiceAlumno < 0) {
         console.error('No se encontró el alumno para eliminar el simulacro');
         return;
     }
-    
+
     alumnos[indiceAlumno].simulacros = alumnos[indiceAlumno].simulacros.filter(s => s.id !== simulacroId);
     guardarAlumnosBD(alumnos);
 }
@@ -91,9 +87,9 @@ function exportarBD() {
     const alumnos = obtenerAlumnosBD();
     const dataStr = JSON.stringify(alumnos, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-    
+
     const exportFileDefaultName = 'autoescuela_backup_' + new Date().toISOString().split('T')[0] + '.json';
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -103,11 +99,11 @@ function exportarBD() {
 function importarBD(jsonData) {
     try {
         const alumnos = JSON.parse(jsonData);
-        
+
         if (!Array.isArray(alumnos)) {
             throw new Error('El formato de los datos no es válido');
         }
-        
+
         guardarAlumnosBD(alumnos);
         return true;
     } catch (error) {
@@ -116,12 +112,17 @@ function importarBD(jsonData) {
     }
 }
 
-// Make functions available globally
+// Hacer funciones disponibles globalmente (para WebView)
 window.obtenerAlumnoPorId = obtenerAlumnoPorId;
 window.obtenerAlumnosBD = obtenerAlumnosBD;
 window.guardarSimulacroBD = guardarSimulacroBD;
+window.guardarAlumnoBD = guardarAlumnoBD;
+window.eliminarAlumnoBD = eliminarAlumnoBD;
+window.eliminarSimulacroBD = eliminarSimulacroBD;
+window.exportarBD = exportarBD;
+window.importarBD = importarBD;
 
-// Export all the database functions
+// Exportar todas las funciones (para posibles usos en otros módulos)
 export {
     inicializarBD,
     obtenerAlumnosBD,
