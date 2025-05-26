@@ -319,12 +319,11 @@ function inicializarCatalogoFaltas() {
 }
 
 // Export all functions - Fixed export section
-export {
-    FALTAS_PREDETERMINADAS,
-    cargarCatalogoFaltas,
-    agregarFalta,
-    actualizarFalta,
-    eliminarFalta,
-    ordenarFaltas,
-    inicializarCatalogoFaltas
-};
+window.FALTAS_PREDETERMINADAS = FALTAS_PREDETERMINADAS;
+window.cargarCatalogoFaltas = cargarCatalogoFaltas;
+window.agregarFalta = agregarFalta;
+window.actualizarFalta = actualizarFalta;
+window.eliminarFalta = eliminarFalta;
+window.ordenarFaltas = ordenarFaltas;
+window.inicializarCatalogoFaltas = inicializarCatalogoFaltas;
+
