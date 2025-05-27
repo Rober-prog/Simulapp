@@ -1,0 +1,10 @@
+/* Menu specific styles */
+
+*/.contenedor-opciones
+    display: flex;
+    flex-direction: column;
+    gap: 15         px;
+    ;
+    padding:  : 1    px;
+:
+
