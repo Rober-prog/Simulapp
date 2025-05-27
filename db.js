@@ -123,5 +123,3 @@ window.eliminarAlumnoBD = eliminarAlumnoBD;
 window.eliminarSimulacroBD = eliminarSimulacroBD;
 window.exportarBD = exportarBD;
 window.importarBD = importarBD;
-
-
