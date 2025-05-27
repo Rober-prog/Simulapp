@@ -1,6 +1,21 @@
 // MAIN APPLICATION
 // This is the main entry point that initializes the application
 
+console.log("Probando funciones globales...");
+
+if (typeof window.mostrarPantalla === "function") {
+    console.log("mostrarPantalla está disponible");
+} else {
+    console.error("mostrarPantalla NO está disponible");
+}
+
+
+
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize the database
     window.inicializarBD();
@@ -38,8 +53,13 @@ function setupEventListeners() {
     const btnEntrar = document.getElementById('btn-entrar');
     if (btnEntrar) {
         btnEntrar.addEventListener('click', () => {
-            window.mostrarPantalla('pantalla-menu');
-        });
+    alert('Has hecho clic en ENTRAR');
+    if (typeof window.mostrarPantalla === "function") {
+        window.mostrarPantalla('pantalla-menu');
+    } else {
+        alert("mostrarPantalla no está disponible");
+    }
+});
     }
 
     // Menú principal
