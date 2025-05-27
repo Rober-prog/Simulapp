@@ -1,62 +1,60 @@
-// Handles simulation result determination and reporting
+// RESULT MODULE
+// Lógica para mostrar el resultado final del simulacro
 
-function ResultVisitor() {}
+function mostrarResultadoFinal() {
+    const contenedor = document.getElementById('contenido-resultado');
+    contenedor.innerHTML = '';
 
-ResultVisitor.prototype.determineResult = function(simulacro) {
-    const faltas = simulacro.faltas;
-    let apto = true;
-    let reason = '';
-
-    // Existing logic to determine apto and reason
-    if (faltas.some(f => f.tipo === 'eliminatoria')) {
-        apto = false;
-        reason = 'Falta eliminatoria detectada';
-    } else {
-        const deficientes = faltas.filter(f => f.tipo === 'deficiente').length;
-        const leves = faltas.filter(f => f.tipo === 'leve').length;
-
-        if (deficientes >= 2) {
-            apto = false;
-            reason = '2 o más faltas deficientes';
-        } else if (leves >= 10) {
-            apto = false;
-            reason = '10 o más faltas leves';
-        }
+    if (!window.simulacroActual) {
+        contenedor.textContent = 'No hay simulacro cargado.';
+        return;
     }
 
-    return { isApto: apto, reason };
-};
+    const faltas = window.simulacroActual.faltas;
+    const numEliminatorias = faltas.filter(f => f.tipo === 'eliminatoria').length;
+    const numDeficientes = faltas.filter(f => f.tipo === 'deficiente').length;
+    const numLeves = faltas.filter(f => f.tipo === 'leve').length;
 
-ResultVisitor.prototype.showReport = function(result) {
-    // Build report HTML based on result
-    const reportHtml = `
-        <h2>Resultado del Simulacro</h2>
-        <p>APTO: ${result.isApto ? 'Sí' : 'No'}</p>
-        <p>Razón: ${result.reason}</p>
+    const resultado = document.createElement('div');
+    resultado.classList.add('resultado-final');
+
+    let mensaje = '';
+    let color = '';
+
+    if (numEliminatorias > 0) {
+        mensaje = '¡NO APTO! LA RECOMENDACIÓN ES SEGUIR PRACTICANDO...';
+        color = 'rojo';
+    } else if (numDeficientes > 2) {
+        mensaje = '¡NO APTO! LA RECOMENDACIÓN ES SEGUIR PRACTICANDO...';
+        color = 'rojo';
+    } else if (numLeves > 9) {
+        mensaje = '¡NO APTO! LA RECOMENDACIÓN ES SEGUIR PRACTICANDO...';
+        color = 'rojo';
+    } else {
+        // Contar aptos acumulados
+        const aptosPrevios = window.simulacroActual.alumno.simulacrosAptos || 0;
+        const aptosActual = aptosPrevios + 1;
+
+        if (aptosActual >= 5) {
+            mensaje = '¡APTO! CANDIDATO A EXAMEN';
+        } else {
+            mensaje = '¡APTO! SIGUE ASÍ...';
+        }
+        color = 'verde';
+        // Actualizar contador de aptos en el alumno
+        window.simulacroActual.alumno.simulacrosAptos = aptosActual;
+        window.guardarAlumno(window.simulacroActual.alumno);
+    }
+
+    resultado.innerHTML = `
+        <h2 class="${color}">${mensaje}</h2>
+        <p>Leves: ${numLeves}</p>
+        <p>Deficientes: ${numDeficientes}</p>
+        <p>Eliminatorias: ${numEliminatorias}</p>
     `;
 
-    // Display report
-    const reportElement = document.getElementById('report');
-    if (reportElement) {
-        reportElement.innerHTML = reportHtml;
-    } else {
-        console.error('Elemento con id "report" no encontrado');
-    }
-};
+    contenedor.appendChild(resultado);
+}
 
-ResultVisitor.prototype.showFinalResult = function(result) {
-    // Display final result
-    const finalResultElement = document.getElementById('final-result');
-    if (finalResultElement) {
-        finalResultElement.innerHTML = `
-            <h2>Resultado Final</h2>
-            <p>APTO: ${result.isApto ? 'Sí' : 'No'}</p>
-            <p>Razón: ${result.reason}</p>
-        `;
-    } else {
-        console.error('Elemento con id "final-result" no encontrado');
-    }
-};
-
-// Hacer disponible la clase globalmente
-window.ResultVisitor = ResultVisitor;
+// Hacer la función accesible globalmente
+window.mostrarResultadoFinal = mostrarResultadoFinal;
