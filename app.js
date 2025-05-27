@@ -60,7 +60,7 @@ function setupEventListeners() {
         alert("mostrarPantalla no está disponible");
     }
 });
-    }
+  
 
     // Menú principal
     const btnAnadirAlumno = document.getElementById('btn-anadir-alumno');
