@@ -1,121 +1,54 @@
-// CANDIDATOS A EXAMEN
-// Functions for managing and displaying exam candidates
+// candidatosModule.js
 
-// Function to determine if a simulation is passed
-function esSimulacroApto(simulacro) {
-    if (simulacro.faltas.some(f => f.tipo === 'eliminatoria')) return false;
+window.cargarCandidatosExamen = function() {
+    const lista = document.getElementById('lista-candidatos');
+    if (!lista) {
+        console.error('No se encontró el contenedor de la lista de candidatos');
+        return;
+    }
 
-    const deficientes = simulacro.faltas.filter(f => f.tipo === 'deficiente').length;
-    const leves = simulacro.faltas.filter(f => f.tipo === 'leve').length;
+    lista.innerHTML = '';
 
-    return !(deficientes >= 2 || leves >= 10 || (leves >= 5 && deficientes >= 1));
-}
-
-// Function to load exam candidates
-function cargarCandidatosExamen() {
-    const alumnos = window.obtenerAlumnosBD();
-    const listaCandidatos = document.getElementById('lista-candidatos');
-    listaCandidatos.innerHTML = '';
-
-    // Filtrar candidatos (alumnos con 5 o más simulacros APTOS)
-    const candidatos = alumnos.filter(alumno => {
-        const simulacrosAptos = alumno.simulacros.filter(esSimulacroApto).length;
-        return simulacrosAptos >= 5;
-    });
-
-    // Ordenar por cantidad de simulacros aptos (de mayor a menor)
-    candidatos.sort((a, b) => {
-        const aptosA = a.simulacros.filter(esSimulacroApto).length;
-        const aptosB = b.simulacros.filter(esSimulacroApto).length;
-        return aptosB - aptosA;
+    const candidatos = window.alumnos.filter(alumno => {
+        const aptos = alumno.simulacros.filter(sim => sim.resultado === 'APTO').length;
+        return aptos >= 5;
     });
 
     if (candidatos.length === 0) {
-        listaCandidatos.innerHTML = '<p class="no-resultados">No hay candidatos a examen</p>';
+        lista.innerHTML = '<p>No hay candidatos disponibles.</p>';
         return;
     }
 
-    candidatos.forEach(candidato => {
-        const simulacrosAptos = candidato.simulacros.filter(esSimulacroApto).length;
-
-        const itemCandidato = document.createElement('div');
-        itemCandidato.className = 'candidato-item';
-        itemCandidato.innerHTML = `
-            <div class="candidato-info">
-                <h3>${candidato.nombre} ${candidato.apellido}</h3>
-                <p>Nº: ${candidato.numero}</p>
-            </div>
-            <span class="candidato-aptos">${simulacrosAptos} APTOS</span>
+    candidatos.forEach(alumno => {
+        const item = document.createElement('div');
+        item.classList.add('item-candidato');
+        item.innerHTML = `
+            <strong>${alumno.nombre} ${alumno.apellido}</strong>
+            <p>Simulacros aptos: ${alumno.simulacros.filter(sim => sim.resultado === 'APTO').length}</p>
         `;
-
-        itemCandidato.addEventListener('click', () => {
-            window.mostrarFichaAlumno(candidato);
-        });
-
-        listaCandidatos.appendChild(itemCandidato);
+        lista.appendChild(item);
     });
-}
+};
 
-// Function to filter candidates by search term
-function filtrarCandidatos() {
-    const textoBusqueda = document.getElementById('input-buscar-candidato').value.toLowerCase();
-
-    // Si está vacío, mostrar todos los candidatos
-    if (!textoBusqueda.trim()) {
-        cargarCandidatosExamen();
-        return;
-    }
-
-    const alumnos = window.obtenerAlumnosBD();
-    const listaCandidatos = document.getElementById('lista-candidatos');
-    listaCandidatos.innerHTML = '';
-
-    // Filtrar candidatos (alumnos con 5 o más simulacros APTOS) y por texto
-    const candidatos = alumnos.filter(alumno => {
-        const simulacrosAptos = alumno.simulacros.filter(esSimulacroApto).length;
-
-        const coincideTexto = 
-            alumno.nombre.toLowerCase().includes(textoBusqueda) || 
-            alumno.apellido.toLowerCase().includes(textoBusqueda) ||
-            alumno.numero.includes(textoBusqueda);
-
-        return simulacrosAptos >= 5 && coincideTexto;
-    });
-
-    // Ordenar por cantidad de simulacros aptos (de mayor a menor)
-    candidatos.sort((a, b) => {
-        const aptosA = a.simulacros.filter(esSimulacroApto).length;
-        const aptosB = b.simulacros.filter(esSimulacroApto).length;
-        return aptosB - aptosA;
+window.exportarListaCandidatos = function() {
+    const candidatos = window.alumnos.filter(alumno => {
+        const aptos = alumno.simulacros.filter(sim => sim.resultado === 'APTO').length;
+        return aptos >= 5;
     });
 
     if (candidatos.length === 0) {
-        listaCandidatos.innerHTML = '<p class="no-resultados">No se encontraron candidatos</p>';
+        window.mostrarNotificacion("No hay candidatos para exportar", "error");
         return;
     }
 
-    candidatos.forEach(candidato => {
-        const simulacrosAptos = candidato.simulacros.filter(esSimulacroApto).length;
+    const doc = new jspdf.jsPDF();
+    doc.text("Lista de Candidatos a Examen", 10, 10);
 
-        const itemCandidato = document.createElement('div');
-        itemCandidato.className = 'candidato-item';
-        itemCandidato.innerHTML = `
-            <div class="candidato-info">
-                <h3>${candidato.nombre} ${candidato.apellido}</h3>
-                <p>Nº: ${candidato.numero}</p>
-            </div>
-            <span class="candidato-aptos">${simulacrosAptos} APTOS</span>
-        `;
-
-        itemCandidato.addEventListener('click', () => {
-            window.mostrarFichaAlumno(candidato);
-        });
-
-        listaCandidatos.appendChild(itemCandidato);
+    let y = 20;
+    candidatos.forEach(alumno => {
+        doc.text(`- ${alumno.nombre} ${alumno.apellido} (${alumno.simulacros.filter(sim => sim.resultado === 'APTO').length} aptos)`, 10, y);
+        y += 10;
     });
-}
 
-// Hacer funciones accesibles globalmente
-window.cargarCandidatosExamen = cargarCandidatosExamen;
-window.filtrarCandidatos = filtrarCandidatos;
-window.esSimulacroApto = esSimulacroApto;
+    doc.save('CandidatosExamen.pdf');
+};
