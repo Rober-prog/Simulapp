@@ -2,28 +2,36 @@
 // This is the main entry point that initializes the application
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize the database
-    window.inicializarBD();
+    // Inicializar la base de datos
+    if (typeof window.inicializarBD === 'function') {
+        window.inicializarBD();
+    }
 
-    // Initialize fault catalog
-    window.inicializarCatalogoFaltas();
+    // Inicializar catálogo de faltas
+    if (typeof window.inicializarCatalogoFaltas === 'function') {
+        window.inicializarCatalogoFaltas();
+    }
 
-    // Initialize fault management
-    window.inicializarGestionFaltas();
+    // Inicializar gestión de faltas
+    if (typeof window.inicializarGestionFaltas === 'function') {
+        window.inicializarGestionFaltas();
+    }
 
-    // Setup navigation and events
+    // Configurar eventos
     setupEventListeners();
 
-    // Cargar catálogo de faltas
-    const faltas = window.cargarCatalogoFaltas();
-    console.log(`Loaded ${faltas.length} faults from catalog`);
+    // Cargar catálogo de faltas para verificar
+    if (typeof window.cargarCatalogoFaltas === 'function') {
+        const faltas = window.cargarCatalogoFaltas();
+        console.log(`Catálogo cargado con ${faltas.length} faltas`);
+    }
 });
 
-// Global variables
+// Variable global para el alumno seleccionado
 window.alumnoSeleccionado = null;
 window.simulacroActual = null;
 
-// Event listeners
+// Configurar todos los eventos
 function setupEventListeners() {
     const btnEntrar = document.getElementById('btn-entrar');
     if (btnEntrar) {
@@ -35,18 +43,16 @@ function setupEventListeners() {
     const btnAnadirAlumno = document.getElementById('btn-anadir-alumno');
     if (btnAnadirAlumno) {
         btnAnadirAlumno.addEventListener('click', () => {
-            const numeroAlumno = document.getElementById('numero-alumno');
-            const nombreAlumno = document.getElementById('nombre-alumno');
-            const apellidoAlumno = document.getElementById('apellido-alumno');
-            if (numeroAlumno) numeroAlumno.value = '';
-            if (nombreAlumno) nombreAlumno.value = '';
-            if (apellidoAlumno) apellidoAlumno.value = '';
+            document.getElementById('numero-alumno').value = '';
+            document.getElementById('nombre-alumno').value = '';
+            document.getElementById('apellido-alumno').value = '';
+
             const btnGuardar = document.getElementById('btn-guardar-alumno');
             if (btnGuardar) {
-                btnGuardar.innerHTML = 'Guardar Alumno';
                 btnGuardar.dataset.modo = 'nuevo';
                 btnGuardar.removeAttribute('data-id');
             }
+
             window.mostrarPantalla('pantalla-anadir-alumno');
         });
     }
@@ -55,7 +61,9 @@ function setupEventListeners() {
     if (btnBuscarAlumno) {
         btnBuscarAlumno.addEventListener('click', () => {
             window.mostrarPantalla('pantalla-buscar-alumno');
-            window.cargarListaAlumnos();
+            if (typeof window.cargarListaAlumnos === 'function') {
+                window.cargarListaAlumnos();
+            }
         });
     }
 
@@ -63,88 +71,20 @@ function setupEventListeners() {
     if (btnCandidatos) {
         btnCandidatos.addEventListener('click', () => {
             window.mostrarPantalla('pantalla-candidatos');
-            window.cargarCandidatosExamen();
+            if (typeof window.cargarCandidatosExamen === 'function') {
+                window.cargarCandidatosExamen();
+            }
         });
-    }
-
-    const btnGuardarAlumno = document.getElementById('btn-guardar-alumno');
-    if (btnGuardarAlumno) {
-        btnGuardarAlumno.addEventListener('click', window.guardarAlumno);
-    }
-
-    const inputBuscar = document.getElementById('input-buscar');
-    if (inputBuscar) {
-        inputBuscar.addEventListener('input', window.filtrarAlumnos);
-    }
-
-    const inputBuscarCandidato = document.getElementById('input-buscar-candidato');
-    if (inputBuscarCandidato) {
-        inputBuscarCandidato.addEventListener('input', window.filtrarCandidatos);
     }
 
     const btnConfigurarFaltas = document.getElementById('btn-configurar-faltas');
     if (btnConfigurarFaltas) {
         btnConfigurarFaltas.addEventListener('click', () => {
             window.mostrarPantalla('pantalla-config-faltas');
-            window.inicializarGestionFaltas();
-        });
-    }
-
-    const btnNuevoSimulacro = document.getElementById('btn-nuevo-simulacro');
-    if (btnNuevoSimulacro) {
-        btnNuevoSimulacro.addEventListener('click', window.prepararSimulacro);
-    }
-
-    const btnExportarFicha = document.getElementById('btn-exportar-ficha');
-    if (btnExportarFicha) {
-        btnExportarFicha.addEventListener('click', window.exportarFichaAlumno);
-    }
-
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', window.cambiarTabFaltas);
-    });
-
-    const btnIniciarPrueba = document.getElementById('btn-iniciar-prueba');
-    if (btnIniciarPrueba) {
-        btnIniciarPrueba.addEventListener('click', window.iniciarSimulacro);
-    }
-
-    const btnFinalizarSimulacro = document.getElementById('btn-finalizar-simulacro');
-    if (btnFinalizarSimulacro) {
-        btnFinalizarSimulacro.addEventListener('click', window.finalizarSimulacro);
-    }
-
-    const btnExportarInforme = document.getElementById('btn-exportar-informe');
-    if (btnExportarInforme) {
-        btnExportarInforme.addEventListener('click', window.exportarInformeSimulacro);
-    }
-
-    const btnVolverFicha = document.getElementById('btn-volver-ficha');
-    if (btnVolverFicha) {
-        btnVolverFicha.addEventListener('click', () => {
-            if (window.alumnoSeleccionado) {
-                window.mostrarFichaAlumno(window.alumnoSeleccionado);
-            } else {
-                window.mostrarPantalla('pantalla-menu');
+            if (typeof window.inicializarGestionFaltas === 'function') {
+                window.inicializarGestionFaltas();
             }
         });
-    }
-
-    const btnVerResultado = document.getElementById('btn-ver-resultado');
-    if (btnVerResultado) {
-        btnVerResultado.addEventListener('click', window.mostrarResultadoFinal);
-    }
-
-    const btnVolverMenu = document.getElementById('btn-volver-menu');
-    if (btnVolverMenu) {
-        btnVolverMenu.addEventListener('click', () => {
-            window.mostrarPantalla('pantalla-menu');
-        });
-    }
-
-    const btnExportarCandidatos = document.getElementById('btn-exportar-candidatos');
-    if (btnExportarCandidatos) {
-        btnExportarCandidatos.addEventListener('click', window.exportarListaCandidatos);
     }
 
     const btnInfo = document.getElementById('btn-info');
@@ -161,15 +101,10 @@ function setupEventListeners() {
     });
 }
 
-// Aseguramos funciones globales
-window.guardarAlumno = window.guardarAlumno || function() { console.log("guardarAlumno no cargado"); };
-window.cargarListaAlumnos = window.cargarListaAlumnos || function() { console.log("cargarListaAlumnos no cargado"); };
-window.filtrarAlumnos = window.filtrarAlumnos || function() { console.log("filtrarAlumnos no cargado"); };
-window.mostrarFichaAlumno = window.mostrarFichaAlumno || function() { console.log("mostrarFichaAlumno no cargado"); };
-window.cargarCandidatosExamen = window.cargarCandidatosExamen || function() { console.log("cargarCandidatosExamen no cargado"); };
-window.filtrarCandidatos = window.filtrarCandidatos || function() { console.log("filtrarCandidatos no cargado"); };
-window.exportarFichaAlumno = window.exportarFichaAlumno || function() { console.log("exportarFichaAlumno no cargado"); };
-window.exportarInformeSimulacro = window.exportarInformeSimulacro || function() { console.log("exportarInformeSimulacro no cargado"); };
-window.exportarListaCandidatos = window.exportarListaCandidatos || function() { console.log("exportarListaCandidatos no cargado"); };
-window.mostrarResultadoFinal = window.mostrarResultadoFinal || function() { console.log("mostrarResultadoFinal no cargado"); };
-window.cambiarTabFaltas = window.cambiarTabFaltas || function() { console.log("cambiarTabFaltas no cargado"); };
+// Funciones globales de respaldo para evitar errores si no están definidas
+window.guardarAlumno = window.guardarAlumno || function() { console.log("guardarAlumno no está cargada"); };
+window.cargarListaAlumnos = window.cargarListaAlumnos || function() { console.log("cargarListaAlumnos no está cargada"); };
+window.cargarCandidatosExamen = window.cargarCandidatosExamen || function() { console.log("cargarCandidatosExamen no está cargada"); };
+window.inicializarBD = window.inicializarBD || function() { console.log("inicializarBD no está cargada"); };
+window.inicializarCatalogoFaltas = window.inicializarCatalogoFaltas || function() { console.log("inicializarCatalogoFaltas no está cargada"); };
+window.inicializarGestionFaltas = window.inicializarGestionFaltas || function() { console.log("inicializarGestionFaltas no está cargada"); };
