@@ -3,6 +3,7 @@
 
 // Global variable for screen history
 let historialPantallas = ['pantalla-bienvenida'];
+window.historialPantallas = historialPantallas;
 
 // Variable global para saber la pantalla actual
 window.pantallaActual = 'pantalla-bienvenida';
@@ -41,8 +42,8 @@ function volverPantallaAnterior() {
         // Comprobar si hay un simulacro en curso
         if (window.simulacroEnCurso) {
             if (confirm('¿Estás seguro de salir? Se perderán los datos del simulacro.')) {
-                if (typeof detenerCronometro === 'function') {
-                    detenerCronometro();
+                if (typeof window.detenerCronometro === 'function') {
+                    window.detenerCronometro();
                 }
                 window.simulacroEnCurso = false;
                 console.log('Simulacro detenido por navegación.');
@@ -55,11 +56,15 @@ function volverPantallaAnterior() {
         document.querySelectorAll('.pantalla').forEach(pantalla => {
             pantalla.classList.add('oculto');
         });
-        document.getElementById(pantallaAnterior).classList.remove('oculto');
+        const anterior = document.getElementById(pantallaAnterior);
+        if (anterior) {
+            anterior.classList.remove('oculto');
+        } else {
+            console.error(`No se encontró la pantalla anterior con id: ${pantallaAnterior}`);
+        }
 
         // Actualizar pantalla actual
         window.pantallaActual = pantallaAnterior;
-
         console.log(`Volviendo a pantalla: ${window.pantallaActual}`);
     }
 }
@@ -67,13 +72,11 @@ function volverPantallaAnterior() {
 // Reiniciar historial (opcional, por si quieres usarlo al iniciar app)
 function reiniciarHistorial() {
     historialPantallas = ['pantalla-bienvenida'];
+    window.historialPantallas = historialPantallas; // Asegurar referencia global
     window.pantallaActual = 'pantalla-bienvenida';
 }
 
 // Hacer las funciones accesibles globalmente
 window.mostrarPantalla = mostrarPantalla;
 window.volverPantallaAnterior = volverPantallaAnterior;
-window.historialPantallas = historialPantallas;
 window.reiniciarHistorial = reiniciarHistorial;
-
-
