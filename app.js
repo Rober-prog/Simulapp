@@ -3,32 +3,24 @@
 
 console.log("Probando funciones globales...");
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("Probando funciones globales...");
-    if (typeof window.mostrarPantalla === "function") {
-        console.log("mostrarPantalla está disponible");
-    } else {
-        console.error("mostrarPantalla NO está disponible");
-    }
+if (typeof window.mostrarPantalla === "function") {
+    console.log("mostrarPantalla está disponible");
+} else {
+    console.error("mostrarPantalla NO está disponible");
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize the database
-    if (typeof window.inicializarBD === "function") {
-        window.inicializarBD();
-    }
+    window.inicializarBD();
 
     // Initialize fault catalog - ensure this runs first
     console.log('Initializing fault catalog...');
-    if (typeof window.inicializarCatalogoFaltas === "function") {
-        window.inicializarCatalogoFaltas();
-    }
+    window.inicializarCatalogoFaltas();
 
     // Initialize fault management with logging
     try {
-        if (typeof window.inicializarGestionFaltas === "function") {
-            window.inicializarGestionFaltas();
-            console.log('Fault management initialized');
-        }
+        window.inicializarGestionFaltas();
+        console.log('Fault management initialized');
     } catch (error) {
         console.error('Error initializing fault management:', error);
     }
@@ -36,22 +28,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup navigation and events
     setupEventListeners();
 
-    // Ensure catalog is loaded correctly
-    if (typeof window.cargarCatalogoFaltas === "function") {
-        const faltas = window.cargarCatalogoFaltas();
-        console.log(`Loaded ${faltas.length} faults from catalog`);
-    }
+    // Add this line to ensure catalog is loaded correctly
+    const faltas = window.cargarCatalogoFaltas();
+    console.log(`Loaded ${faltas.length} faults from catalog`);
 });
 
 // Global variables for the application
 let alumnoSeleccionado = null;
 window.alumnoSeleccionado = null;
 let simulacroActual = null;
-window.simulacroActual = null;
-window.simulacroEnCurso = false;
 
 // Simple event listeners setup
 function setupEventListeners() {
+    // Add null checks for all event listeners
+
+    // Pantalla de bienvenida
     const btnEntrar = document.getElementById('btn-entrar');
     if (btnEntrar) {
         btnEntrar.addEventListener('click', () => {
@@ -64,6 +55,7 @@ function setupEventListeners() {
         });
     }
 
+    // Menú principal
     const btnAnadirAlumno = document.getElementById('btn-anadir-alumno');
     if (btnAnadirAlumno) {
         btnAnadirAlumno.addEventListener('click', () => {
@@ -93,9 +85,7 @@ function setupEventListeners() {
     if (btnBuscarAlumno) {
         btnBuscarAlumno.addEventListener('click', () => {
             window.mostrarPantalla('pantalla-buscar-alumno');
-            if (typeof window.cargarListaAlumnos === "function") {
-                window.cargarListaAlumnos();
-            }
+            window.cargarListaAlumnos();
         });
     }
 
@@ -103,111 +93,69 @@ function setupEventListeners() {
     if (btnCandidatos) {
         btnCandidatos.addEventListener('click', () => {
             window.mostrarPantalla('pantalla-candidatos');
-            if (typeof window.cargarCandidatosExamen === "function") {
-                window.cargarCandidatosExamen();
-            }
+            window.cargarCandidatosExamen();
         });
     }
 
     const btnGuardarAlumno = document.getElementById('btn-guardar-alumno');
     if (btnGuardarAlumno) {
-        btnGuardarAlumno.addEventListener('click', () => {
-            if (typeof window.guardarAlumno === "function") {
-                window.guardarAlumno();
-            }
-        });
+        btnGuardarAlumno.addEventListener('click', window.guardarAlumno);
     }
 
     const inputBuscar = document.getElementById('input-buscar');
     if (inputBuscar) {
-        inputBuscar.addEventListener('input', () => {
-            if (typeof window.filtrarAlumnos === "function") {
-                window.filtrarAlumnos();
-            }
-        });
+        inputBuscar.addEventListener('input', window.filtrarAlumnos);
     }
 
     const inputBuscarCandidato = document.getElementById('input-buscar-candidato');
     if (inputBuscarCandidato) {
-        inputBuscarCandidato.addEventListener('input', () => {
-            if (typeof window.filtrarCandidatos === "function") {
-                window.filtrarCandidatos();
-            }
-        });
+        inputBuscarCandidato.addEventListener('input', window.filtrarCandidatos);
     }
 
     const btnConfigurarFaltas = document.getElementById('btn-configurar-faltas');
     if (btnConfigurarFaltas) {
         btnConfigurarFaltas.addEventListener('click', () => {
             window.mostrarPantalla('pantalla-config-faltas');
-            if (typeof window.inicializarGestionFaltas === "function") {
-                window.inicializarGestionFaltas();
-            }
+            window.inicializarGestionFaltas();
         });
     }
 
     const btnNuevoSimulacro = document.getElementById('btn-nuevo-simulacro');
     if (btnNuevoSimulacro) {
-        btnNuevoSimulacro.addEventListener('click', () => {
-            if (typeof window.prepararSimulacro === "function") {
-                window.prepararSimulacro();
-            }
-        });
+        btnNuevoSimulacro.addEventListener('click', window.prepararSimulacro);
     }
 
     const btnExportarFicha = document.getElementById('btn-exportar-ficha');
     if (btnExportarFicha) {
-        btnExportarFicha.addEventListener('click', () => {
-            if (typeof window.exportarFichaAlumno === "function") {
-                window.exportarFichaAlumno();
-            }
-        });
+        btnExportarFicha.addEventListener('click', window.exportarFichaAlumno);
     }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (typeof window.cambiarTabFaltas === "function") {
-                window.cambiarTabFaltas();
-            }
-        });
+        btn.addEventListener('click', window.cambiarTabFaltas);
     });
 
     const btnIniciarPrueba = document.getElementById('btn-iniciar-prueba');
     if (btnIniciarPrueba) {
-        btnIniciarPrueba.addEventListener('click', () => {
-            if (typeof window.iniciarSimulacro === "function") {
-                window.iniciarSimulacro();
-            }
-        });
+        btnIniciarPrueba.addEventListener('click', window.iniciarSimulacro);
     }
 
     const btnFinalizarSimulacro = document.getElementById('btn-finalizar-simulacro');
     if (btnFinalizarSimulacro) {
-        btnFinalizarSimulacro.addEventListener('click', () => {
-            if (typeof window.finalizarSimulacro === "function") {
-                window.finalizarSimulacro();
-            }
-        });
+        btnFinalizarSimulacro.addEventListener('click', window.finalizarSimulacro);
     }
 
     const btnExportarInforme = document.getElementById('btn-exportar-informe');
     if (btnExportarInforme) {
-        btnExportarInforme.addEventListener('click', () => {
-            if (typeof window.exportarInformeSimulacro === "function") {
-                window.exportarInformeSimulacro();
-            }
-        });
+        btnExportarInforme.addEventListener('click', window.exportarInformeSimulacro);
     }
 
     const btnVolverFicha = document.getElementById('btn-volver-ficha');
     if (btnVolverFicha) {
         btnVolverFicha.addEventListener('click', () => {
-            if (window.alumnoSeleccionado && typeof window.mostrarFichaAlumno === "function") {
+            if (window.alumnoSeleccionado) {
                 window.mostrarFichaAlumno(window.alumnoSeleccionado);
             } else {
-                if (typeof window.mostrarNotificacion === "function") {
-                    window.mostrarNotificacion('Error al volver a la ficha del alumno', 'error');
-                }
+                window.mostrarNotificacion('Error al volver a la ficha del alumno', 'error');
                 window.mostrarPantalla('pantalla-menu');
             }
         });
@@ -215,11 +163,7 @@ function setupEventListeners() {
 
     const btnVerResultado = document.getElementById('btn-ver-resultado');
     if (btnVerResultado) {
-        btnVerResultado.addEventListener('click', () => {
-            if (typeof window.mostrarResultadoFinal === "function") {
-                window.mostrarResultadoFinal();
-            }
-        });
+        btnVerResultado.addEventListener('click', window.mostrarResultadoFinal);
     }
 
     const btnVolverMenu = document.getElementById('btn-volver-menu');
@@ -231,11 +175,7 @@ function setupEventListeners() {
 
     const btnExportarCandidatos = document.getElementById('btn-exportar-candidatos');
     if (btnExportarCandidatos) {
-        btnExportarCandidatos.addEventListener('click', () => {
-            if (typeof window.exportarListaCandidatos === "function") {
-                window.exportarListaCandidatos();
-            }
-        });
+        btnExportarCandidatos.addEventListener('click', window.exportarListaCandidatos);
     }
 
     const btnInfo = document.getElementById('btn-info');
@@ -252,16 +192,16 @@ function setupEventListeners() {
     });
 }
 
-// Asegurar funciones globales si no están cargadas aún
-window.guardarAlumno = window.guardarAlumno || function() { console.log("guardarAlumno no disponible"); };
-window.cargarListaAlumnos = window.cargarListaAlumnos || function() { console.log("cargarListaAlumnos no disponible"); };
-window.filtrarAlumnos = window.filtrarAlumnos || function() { console.log("filtrarAlumnos no disponible"); };
-window.mostrarFichaAlumno = window.mostrarFichaAlumno || function() { console.log("mostrarFichaAlumno no disponible"); };
-window.cargarCandidatosExamen = window.cargarCandidatosExamen || function() { console.log("cargarCandidatosExamen no disponible"); };
-window.filtrarCandidatos = window.filtrarCandidatos || function() { console.log("filtrarCandidatos no disponible"); };
-window.exportarFichaAlumno = window.exportarFichaAlumno || function() { console.log("exportarFichaAlumno no disponible"); };
-window.exportarInformeSimulacro = window.exportarInformeSimulacro || function() { console.log("exportarInformeSimulacro no disponible"); };
-window.exportarListaCandidatos = window.exportarListaCandidatos || function() { console.log("exportarListaCandidatos no disponible"); };
-window.mostrarResultadoFinal = window.mostrarResultadoFinal || function() { console.log("mostrarResultadoFinal no disponible"); };
-window.cambiarTabFaltas = window.cambiarTabFaltas || function() { console.log("cambiarTabFaltas no disponible"); };
-window.mostrarFaltasPorTipo = window.mostrarFaltasPorTipo || function() { console.log("mostrarFaltasPorTipo no disponible"); };
+// Make functions available globally if they're used in HTML event attributes
+window.guardarAlumno = window.guardarAlumno || function() { console.log("guardarAlumno not loaded yet"); };
+window.cargarListaAlumnos = window.cargarListaAlumnos || function() { console.log("cargarListaAlumnos not loaded yet"); };
+window.filtrarAlumnos = window.filtrarAlumnos || function() { console.log("filtrarAlumnos not loaded yet"); };
+window.mostrarFichaAlumno = window.mostrarFichaAlumno || function() { console.log("mostrarFichaAlumno not loaded yet"); };
+window.cargarCandidatosExamen = window.cargarCandidatosExamen || function() { console.log("cargarCandidatosExamen not loaded yet"); };
+window.filtrarCandidatos = window.filtrarCandidatos || function() { console.log("filtrarCandidatos not loaded yet"); };
+window.exportarFichaAlumno = window.exportarFichaAlumno || function() { console.log("exportarFichaAlumno not loaded yet"); };
+window.exportarInformeSimulacro = window.exportarInformeSimulacro || function() { console.log("exportarInformeSimulacro not loaded yet"); };
+window.exportarListaCandidatos = window.exportarListaCandidatos || function() { console.log("exportarListaCandidatos not loaded yet"); };
+window.mostrarResultadoFinal = window.mostrarResultadoFinal || function() { console.log("mostrarResultadoFinal not loaded yet"); };
+window.cambiarTabFaltas = window.cambiarTabFaltas || function() { console.log("cambiarTabFaltas not loaded yet"); };
+window.mostrarFaltasPorTipo = window.mostrarFaltasPorTipo || function() { console.log("mostrarFaltasPorTipo not loaded yet"); };
