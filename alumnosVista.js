@@ -1,98 +1,42 @@
-// VISTA DE ALUMNOS
-// Functions for displaying student information and details
-
-// Global variable for selected student
-let alumnoSeleccionado = null;
-window.alumnoSeleccionado = null; // Asegura referencia global al cargar el script
-
-// Function to display student details
-function mostrarFichaAlumno(alumno) {
+// alumnosVista.js
+window.mostrarFichaAlumno = function(alumno) {
     if (!alumno) {
-        window.mostrarNotificacion('Error: No se pudo cargar el alumno', 'error');
-        window.mostrarPantalla('pantalla-menu');
+        console.error('No se proporcionó un alumno válido.');
         return;
     }
 
-    alumnoSeleccionado = alumno;
-    window.alumnoSeleccionado = alumno; // Update global reference
-
-    // Actualizar datos del alumno por si han cambiado
-    const alumnoActualizado = window.obtenerAlumnoPorId(alumno.id);
-
-    if (!alumnoActualizado) {
-        window.mostrarNotificacion('Error: El alumno ya no existe en la base de datos', 'error');
-        window.mostrarPantalla('pantalla-menu');
-        return;
-    }
-
-    // Use the updated student data
-    alumno = alumnoActualizado;
-    alumnoSeleccionado = alumnoActualizado;
-    window.alumnoSeleccionado = alumnoActualizado;
+    window.alumnoSeleccionado = alumno;
 
     const datosAlumno = document.getElementById('datos-alumno');
+    if (!datosAlumno) {
+        console.error('No se encontró el contenedor de la ficha del alumno.');
+        return;
+    }
+
     datosAlumno.innerHTML = `
-        <h3>${alumno.nombre} ${alumno.apellido}</h3>
         <p><strong>Número:</strong> ${alumno.numero}</p>
+        <p><strong>Nombre:</strong> ${alumno.nombre}</p>
+        <p><strong>Apellido:</strong> ${alumno.apellido}</p>
     `;
 
     const listaSimulacros = document.getElementById('lista-simulacros');
-    listaSimulacros.innerHTML = '';
+    if (listaSimulacros) {
+        listaSimulacros.innerHTML = '';
 
-    if (!alumno.simulacros || alumno.simulacros.length === 0) {
-        listaSimulacros.innerHTML = '<p class="no-resultados">No hay simulacros registrados</p>';
-    } else {
-        // Sort simulacros by date (most recent first)
-        const simulacrosOrdenados = [...alumno.simulacros].sort((a, b) => 
-            new Date(b.fecha) - new Date(a.fecha)
-        );
-
-        simulacrosOrdenados.forEach(simulacro => {
-            const fechaSimulacro = new Date(simulacro.fecha);
-
-            const itemSimulacro = document.createElement('div');
-            itemSimulacro.className = 'item-lista';
-
-            // Calcular resultado
-            let resultado = 'APTO';
-            if (simulacro.faltas.some(f => f.tipo === 'eliminatoria')) {
-                resultado = 'NO APTO';
-            } else {
-                const deficientes = simulacro.faltas.filter(f => f.tipo === 'deficiente').length;
-                const leves = simulacro.faltas.filter(f => f.tipo === 'leve').length;
-
-                if (deficientes >= 2 || leves >= 10 || (leves >= 5 && deficientes >= 1)) {
-                    resultado = 'NO APTO';
-                }
-            }
-
-            // Add classes to highlight results with color
-            const resultadoClass = resultado === 'APTO' ? 'resultado-apto-text' : 'resultado-no-apto-text';
-
-            itemSimulacro.innerHTML = `
-                <div class="item-contenido">
-                    <h3>Simulacro: ${fechaSimulacro.toLocaleDateString()}</h3>
-                    <p>Hora: ${fechaSimulacro.toLocaleTimeString()} - Duración: ${simulacro.duracion}</p>
-                    <p>Resultado: <strong class="${resultadoClass}">${resultado}</strong></p>
-                </div>
-                <div class="item-acciones">
-                    <button class="btn-ver-detalles" title="Ver detalles">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </button>
-                </div>
-            `;
-
-            itemSimulacro.addEventListener('click', () => {
-                // Show the simulation report when clicking on a simulation
-                window.mostrarInformeSimulacro(simulacro);
+        if (alumno.simulacros && alumno.simulacros.length > 0) {
+            alumno.simulacros.forEach((simulacro, index) => {
+                const item = document.createElement('div');
+                item.classList.add('item-simulacro');
+                item.innerHTML = `
+                    <p>Simulacro ${index + 1}: ${simulacro.resultado || 'Sin resultado'}</p>
+                    <p>Faltas: Leves(${simulacro.leves || 0}), Deficientes(${simulacro.deficientes || 0}), Eliminatorias(${simulacro.eliminatorias || 0})</p>
+                `;
+                listaSimulacros.appendChild(item);
             });
-
-            listaSimulacros.appendChild(itemSimulacro);
-        });
+        } else {
+            listaSimulacros.innerHTML = '<p>No hay simulacros registrados.</p>';
+        }
     }
 
     window.mostrarPantalla('pantalla-ficha-alumno');
-}
-
-// Hacer la función disponible globalmente
-window.mostrarFichaAlumno = mostrarFichaAlumno;
+};
