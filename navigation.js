@@ -73,7 +73,7 @@ function reiniciarHistorial() {
 // Hacer las funciones accesibles globalmente
 window.mostrarPantalla = mostrarPantalla;
 window.volverPantallaAnterior = volverPantallaAnterior;
-window.historialpantallas = historialPantallas;
+window.historialPantallas = historialPantallas;
 window.reiniciarHistorial = reiniciarHistorial;
 
 
