@@ -1,246 +1,188 @@
-// SIMULACROS
-// Functions for simulation management
+// SIMULACRO MODULE
+// Lógica para gestionar el simulacro de examen
 
-// Asegurar las dependencias globales
-window.mostrarPantalla = window.mostrarPantalla || function() {};
-window.obtenerAlumnoPorId = window.obtenerAlumnoPorId || function() {};
-window.guardarSimulacroBD = window.guardarSimulacroBD || function() {};
-window.obtenerAlumnosBD = window.obtenerAlumnosBD || function() {};
-window.guardarAlumnosBD = window.guardarAlumnosBD || function() {};
-window.cargarCatalogoFaltas = window.cargarCatalogoFaltas || function() {};
-window.mostrarNotificacion = window.mostrarNotificacion || function() {};
-
-window.tiempoInicio = null;
-window.cronometroInterval = null;
 window.simulacroActual = null;
 window.simulacroEnCurso = false;
+let cronometroIntervalo = null;
+let tiempoInicioSimulacro = null;
 
-window.prepararSimulacro = function() {
-    if (!window.alumnoSeleccionado) {
-        window.mostrarNotificacion('Error: No hay alumno seleccionado', 'error');
+// Iniciar simulacro
+function iniciarSimulacro() {
+    if (!window.simulacroActual) {
+        alert('No hay simulacro preparado.');
         return;
     }
-    
-    const datosSimulacroAlumno = document.getElementById('datos-simulacro-alumno');
-    datosSimulacroAlumno.innerHTML = `
-        <p><strong>${window.alumnoSeleccionado.nombre} ${window.alumnoSeleccionado.apellido}</strong></p>
-        <p>Nº: ${window.alumnoSeleccionado.numero}</p>
-    `;
-    
-    document.getElementById('cronometro').textContent = '00:00:00';
-    
-    document.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('activo'));
-    document.querySelector('.tab-btn[data-tipo="leve"]').classList.add('activo');
-    
-    document.getElementById('contador-leves').textContent = '0';
-    document.getElementById('contador-deficientes').textContent = '0';
-    document.getElementById('contador-eliminatorias').textContent = '0';
-    
-    document.getElementById('btn-iniciar-prueba').style.display = 'block';
-    document.getElementById('btn-finalizar-simulacro').style.display = 'none';
-    window.simulacroActual = null;
-    window.simulacroEnCurso = false;
-    
-    window.mostrarPantalla('pantalla-simulacro');
-};
 
-window.iniciarSimulacro = function() {
-    window.tiempoInicio = new Date();
-    window.simulacroActual = {
-        id: Date.now().toString(),
-        alumnoId: window.alumnoSeleccionado.id,
-        fecha: window.tiempoInicio.toISOString(),
-        duracion: '00:00:00',
-        faltas: [],
-        observaciones: ''
-    };
     window.simulacroEnCurso = true;
+    tiempoInicioSimulacro = new Date();
+    actualizarCronometro();
+    cronometroIntervalo = setInterval(actualizarCronometro, 1000);
 
-    iniciarCronometro();
-    
-    document.getElementById('btn-iniciar-prueba').style.display = 'none';
-    document.getElementById('btn-finalizar-simulacro').style.display = 'block';
-    
-    const tipoActivo = document.querySelector('.tab-btn.activo').dataset.tipo;
-    window.mostrarFaltasPorTipo(tipoActivo);
-    
-    window.mostrarNotificacion('Simulacro iniciado', 'exito');
-};
-
-function iniciarCronometro() {
-    const cronometroElement = document.getElementById('cronometro');
-    
-    window.cronometroInterval = setInterval(() => {
-        const ahora = new Date();
-        const diferencia = new Date(ahora - window.tiempoInicio);
-        
-        const horas = diferencia.getUTCHours().toString().padStart(2, '0');
-        const minutos = diferencia.getUTCMinutes().toString().padStart(2, '0');
-        const segundos = diferencia.getUTCSeconds().toString().padStart(2, '0');
-        
-        cronometroElement.textContent = `${horas}:${minutos}:${segundos}`;
-        window.simulacroActual.duracion = `${horas}:${minutos}:${segundos}`;
-    }, 1000);
+    alert('Simulacro iniciado.');
 }
 
-window.detenerCronometro = function() {
-    if (window.cronometroInterval) {
-        clearInterval(window.cronometroInterval);
-        window.cronometroInterval = null;
+// Finalizar simulacro
+function finalizarSimulacro() {
+    if (!window.simulacroEnCurso) {
+        alert('No hay simulacro en curso.');
+        return;
     }
-};
 
-window.cambiarTabFaltas = function(event) {
-    document.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('activo'));
-    event.target.classList.add('activo');
-    
-    const tipo = event.target.dataset.tipo;
-    window.mostrarFaltasPorTipo(tipo);
-};
+    clearInterval(cronometroIntervalo);
+    window.simulacroEnCurso = false;
 
-window.registrarFalta = function(falta) {
-    try {
-        if (!window.simulacroActual) {
-            window.mostrarNotificacion('Debe iniciar el simulacro primero', 'advertencia');
-            return;
-        }
+    const tiempoFin = new Date();
+    const duracion = Math.floor((tiempoFin - tiempoInicioSimulacro) / 1000); // segundos
 
-        const tiempoTranscurrido = new Date() - window.tiempoInicio;
-        const minutos = Math.floor(tiempoTranscurrido / 60000);
-        
-        window.simulacroActual.faltas.push({
-            id: Date.now().toString(),
-            faltaId: falta.id,
-            codigo: falta.codigo,
-            descripcion: falta.descripcion || '',
-            tipo: falta.tipo || 'leve',
-            minuto: minutos
-        });
-        
-        const itemFalta = document.querySelector(`.falta-item[data-id="${falta.id}"]`);
-        if (itemFalta) {
-            const contadorElement = itemFalta.querySelector('.contador-falta');
-            const btnRestar = itemFalta.querySelector('.btn-restar-falta');
-            if (contadorElement) {
-                const nuevoConteo = window.simulacroActual.faltas.filter(f => f.faltaId === falta.id).length;
-                contadorElement.textContent = nuevoConteo;
-            }
-            if (btnRestar) btnRestar.disabled = false;
-        }
-        
-        actualizarContadoresFaltas();
-        
-    } catch (error) {
-        console.error('Error al registrar falta:', error);
-        window.mostrarNotificacion('Error al registrar la falta', 'error');
+    window.simulacroActual.duracion = duracion;
+    guardarSimulacro(window.simulacroActual);
+
+    alert('Simulacro finalizado.');
+
+    window.mostrarPantalla('pantalla-informe');
+    mostrarInformeSimulacro();
+}
+
+// Preparar simulacro (cuando se pulsa "Nuevo Simulacro")
+function prepararSimulacro() {
+    if (!window.alumnoSeleccionado) {
+        alert('Primero selecciona un alumno.');
+        return;
     }
-};
 
-window.restarFalta = function(faltaId) {
-    try {
-        if (!window.simulacroActual) {
-            window.mostrarNotificacion('No hay simulacro activo', 'advertencia');
-            return;
-        }
+    const alumno = window.alumnoSeleccionado;
 
-        const index = [...window.simulacroActual.faltas].reverse().findIndex(f => f.faltaId === faltaId);
-        if (index !== -1) {
-            const actualIndex = window.simulacroActual.faltas.length - 1 - index;
-            window.simulacroActual.faltas.splice(actualIndex, 1);
-            
-            actualizarContadoresFaltas();
-            
-            const itemFalta = document.querySelector(`.falta-item[data-id="${faltaId}"]`);
-            if (itemFalta) {
-                const contadorElement = itemFalta.querySelector('.contador-falta');
-                const btnRestar = itemFalta.querySelector('.btn-restar-falta');
-                if (contadorElement) {
-                    const nuevoConteo = window.simulacroActual.faltas.filter(f => f.faltaId === faltaId).length;
-                    contadorElement.textContent = nuevoConteo;
-                    if (btnRestar) btnRestar.disabled = nuevoConteo === 0;
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Error al restar falta:', error);
-        window.mostrarNotificacion('Error al restar la falta', 'error');
+    window.simulacroActual = {
+        alumnoId: alumno.id,
+        fecha: new Date().toISOString(),
+        faltas: [],
+        duracion: 0
+    };
+
+    actualizarContadoresFaltas();
+    cargarFaltasEnSimulacro();
+
+    window.mostrarPantalla('pantalla-simulacro');
+}
+
+// Añadir falta al simulacro
+function agregarFaltaSimulacro(codigo, descripcion, tipo) {
+    if (!window.simulacroActual) {
+        alert('No hay simulacro activo.');
+        return;
     }
-};
 
-window.mostrarFaltasPorTipo = function(tipo) {
-    const listaFaltas = document.getElementById('lista-faltas');
-    if (!listaFaltas) return;
-    
-    listaFaltas.innerHTML = '';
-    
-    try {
-        const faltas = window.cargarCatalogoFaltas();
-        if (!faltas || !Array.isArray(faltas)) {
-            listaFaltas.innerHTML = '<p class="no-resultados">Error al cargar las faltas</p>';
-            return;
-        }
-        
-        const faltasFiltradas = faltas.filter(f => f.tipo === tipo && f.activa !== false);
-        if (faltasFiltradas.length === 0) {
-            listaFaltas.innerHTML = '<p class="no-resultados">No hay faltas configuradas para este tipo</p>';
-            return;
-        }
-        
-        faltasFiltradas.forEach(falta => {
-            const itemFalta = document.createElement('div');
-            itemFalta.className = `falta-item tipo-${falta.tipo}`;
-            itemFalta.dataset.id = falta.id;
-            itemFalta.dataset.codigo = falta.codigo;
-            itemFalta.dataset.descripcion = falta.descripcion;
-            
-            const conteoFalta = window.simulacroActual ? 
-                window.simulacroActual.faltas.filter(f => f.faltaId === falta.id).length : 0;
-            
-            itemFalta.innerHTML = `
-                <div class="falta-contenido">
-                    <div class="falta-info">
-                        <h4>${falta.codigo} - ${falta.descripcion}</h4>
-                    </div>
-                </div>
-                <div class="falta-acciones">
-                    <div class="contador-falta">${conteoFalta}</div>
-                    <button class="btn-restar-falta" ${conteoFalta === 0 ? 'disabled' : ''} title="Restar falta">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path></svg>
-                    </button>
-                </div>
-            `;
-            
-            itemFalta.querySelector('.falta-contenido').addEventListener('click', () => window.registrarFalta(falta));
-            itemFalta.querySelector('.btn-restar-falta').addEventListener('click', (e) => {
-                e.stopPropagation();
-                window.restarFalta(falta.id);
-            });
-            
-            listaFaltas.appendChild(itemFalta);
-        });
-    } catch (error) {
-        console.error('Error displaying faults:', error);
-        listaFaltas.innerHTML = '<p class="no-resultados">Error al cargar las faltas</p>';
-    }
-};
+    window.simulacroActual.faltas.push({ codigo, descripcion, tipo, minuto: obtenerMinutoActual() });
+    actualizarContadoresFaltas();
+}
 
+// Actualizar contadores en pantalla
 function actualizarContadoresFaltas() {
-    const leves = window.simulacroActual.faltas.filter(f => f.tipo === 'leve').length;
-    const deficientes = window.simulacroActual.faltas.filter(f => f.tipo === 'deficiente').length;
-    const eliminatorias = window.simulacroActual.faltas.filter(f => f.tipo === 'eliminatoria').length;
-    
+    const leves = contarFaltasPorTipo('leve');
+    const deficientes = contarFaltasPorTipo('deficiente');
+    const eliminatorias = contarFaltasPorTipo('eliminatoria');
+
     document.getElementById('contador-leves').textContent = leves;
     document.getElementById('contador-deficientes').textContent = deficientes;
     document.getElementById('contador-eliminatorias').textContent = eliminatorias;
 }
 
-window.finalizarSimulacroDesdeAndroid = function() {
-    if (window.simulacroEnCurso) {
-        window.finalizarSimulacro();
-        window.simulacroEnCurso = false;
-        console.log("Simulacro finalizado desde Android");
+// Contar faltas por tipo
+function contarFaltasPorTipo(tipo) {
+    if (!window.simulacroActual) return 0;
+    return window.simulacroActual.faltas.filter(f => f.tipo === tipo).length;
+}
+
+// Obtener minuto actual del cronómetro
+function obtenerMinutoActual() {
+    if (!tiempoInicioSimulacro) return 0;
+    return Math.floor((new Date() - tiempoInicioSimulacro) / 60000);
+}
+
+// Cronómetro
+function actualizarCronometro() {
+    if (!tiempoInicioSimulacro) return;
+    const ahora = new Date();
+    const diferencia = ahora - tiempoInicioSimulacro;
+
+    const horas = String(Math.floor(diferencia / 3600000)).padStart(2, '0');
+    const minutos = String(Math.floor((diferencia % 3600000) / 60000)).padStart(2, '0');
+    const segundos = String(Math.floor((diferencia % 60000) / 1000)).padStart(2, '0');
+
+    document.getElementById('cronometro').textContent = `${horas}:${minutos}:${segundos}`;
+}
+
+// Guardar simulacro en el alumno
+function guardarSimulacro(simulacro) {
+    const alumnos = JSON.parse(localStorage.getItem('alumnos')) || [];
+    const alumno = alumnos.find(a => a.id === simulacro.alumnoId);
+
+    if (!alumno) {
+        alert('No se encontró el alumno.');
+        return;
     }
-};
 
-// Las demás funciones como mostrarInformeSimulacro, mostrarResultadoFinal, etc., se añaden de forma similar a este esquema global.
+    if (!alumno.simulacros) alumno.simulacros = [];
+    alumno.simulacros.push(simulacro);
 
+    const apto = simulacro.faltas.filter(f => f.tipo === 'eliminatoria').length === 0 &&
+                 simulacro.faltas.filter(f => f.tipo === 'deficiente').length <= 2;
+
+    if (apto) {
+        alumno.simulacrosAptos = (alumno.simulacrosAptos || 0) + 1;
+    }
+
+    localStorage.setItem('alumnos', JSON.stringify(alumnos));
+}
+
+// Mostrar informe del simulacro finalizado
+function mostrarInformeSimulacro() {
+    const contenedor = document.getElementById('contenido-informe');
+    contenedor.innerHTML = '';
+
+    if (!window.simulacroActual) {
+        contenedor.textContent = 'No hay simulacro cargado.';
+        return;
+    }
+
+    const alumno = window.alumnoSeleccionado;
+    const resumen = document.createElement('div');
+    resumen.innerHTML = `
+        <p><strong>Alumno:</strong> ${alumno.nombre} ${alumno.apellido}</p>
+        <p><strong>Duración:</strong> ${window.simulacroActual.duracion} segundos</p>
+        <p><strong>Faltas:</strong></p>
+        <ul>
+            ${window.simulacroActual.faltas.map(f => `<li>${f.codigo} - ${f.descripcion} (${f.tipo}) - Minuto ${f.minuto}</li>`).join('')}
+        </ul>
+    `;
+
+    contenedor.appendChild(resumen);
+}
+
+// Cargar faltas en pantalla de simulacro
+function cargarFaltasEnSimulacro() {
+    const lista = document.getElementById('lista-faltas');
+    lista.innerHTML = '';
+
+    const catalogo = window.cargarCatalogoFaltas();
+
+    catalogo.forEach(falta => {
+        const item = document.createElement('div');
+        item.className = 'item-falta';
+        item.textContent = `${falta.codigo} - ${falta.descripcion}`;
+        item.addEventListener('click', () => {
+            agregarFaltaSimulacro(falta.codigo, falta.descripcion, falta.tipo);
+        });
+
+        lista.appendChild(item);
+    });
+}
+
+// Hacer funciones accesibles globalmente
+window.iniciarSimulacro = iniciarSimulacro;
+window.finalizarSimulacro = finalizarSimulacro;
+window.prepararSimulacro = prepararSimulacro;
+window.agregarFaltaSimulacro = agregarFaltaSimulacro;
+window.actualizarContadoresFaltas = actualizarContadoresFaltas;
+window.cargarFaltasEnSimulacro = cargarFaltasEnSimulacro;
+window.mostrarInformeSimulacro = mostrarInformeSimulacro;
