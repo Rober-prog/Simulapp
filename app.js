@@ -3,11 +3,13 @@
 
 console.log("Probando funciones globales...");
 
-if (typeof window.mostrarPantalla === "function") {
-    console.log("mostrarPantalla está disponible");
-} else {
-    console.error("mostrarPantalla NO está disponible");
-}
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("Probando funciones globales...");
+    if (typeof window.mostrarPantalla === "function") {
+        console.log("mostrarPantalla está disponible");
+    } else {
+        console.error("mostrarPantalla NO está disponible");
+    }
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize the database
