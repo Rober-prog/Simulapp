@@ -41,8 +41,8 @@ function volverPantallaAnterior() {
         // Comprobar si hay un simulacro en curso
         if (window.simulacroEnCurso) {
             if (confirm('¿Estás seguro de salir? Se perderán los datos del simulacro.')) {
-                if (typeof detenerCronometro === 'function') {
-                    detenerCronometro();
+                if (typeof window.detenerCronometro === 'function') {
+                    window.detenerCronometro();
                 }
                 window.simulacroEnCurso = false;
                 console.log('Simulacro detenido por navegación.');
@@ -64,7 +64,7 @@ function volverPantallaAnterior() {
     }
 }
 
-// Reiniciar historial
+// Reiniciar historial (opcional, por si quieres usarlo al iniciar app)
 function reiniciarHistorial() {
     historialPantallas = ['pantalla-bienvenida'];
     window.pantallaActual = 'pantalla-bienvenida';
