@@ -1,29 +1,54 @@
-// GESTIÓN DE ALUMNOS
-// Functions for student management
+// alumnosModule.js
 
-// Variables de dependencias globales
-// (asegúrate de que estos módulos ya estén cargados en el index.html)
-window.mostrarFichaAlumno = window.mostrarFichaAlumno || function() { console.log("mostrarFichaAlumno not loaded yet"); };
-window.guardarAlumno = window.guardarAlumno || function() { console.log("guardarAlumno not loaded yet"); };
-window.editarAlumno = window.editarAlumno || function() { console.log("editarAlumno not loaded yet"); };
-window.confirmarEliminarAlumno = window.confirmarEliminarAlumno || function() { console.log("confirmarEliminarAlumno not loaded yet"); };
-window.cargarListaAlumnos = window.cargarListaAlumnos || function() { console.log("cargarListaAlumnos not loaded yet"); };
-window.filtrarAlumnos = window.filtrarAlumnos || function() { console.log("filtrarAlumnos not loaded yet"); };
-window.cargarCandidatosExamen = window.cargarCandidatosExamen || function() { console.log("cargarCandidatosExamen not loaded yet"); };
-window.filtrarCandidatos = window.filtrarCandidatos || function() { console.log("filtrarCandidatos not loaded yet"); };
+// Base de datos local para los alumnos (almacenados en LocalStorage)
+window.alumnos = window.alumnos || [];
 
-// Esto es opcional, pero puedes inicializar algo si necesitas
-// Por ejemplo: window.cargarListaAlumnos();
+window.guardarAlumno = function() {
+    const numero = document.getElementById('numero-alumno').value.trim();
+    const nombre = document.getElementById('nombre-alumno').value.trim();
+    const apellido = document.getElementById('apellido-alumno').value.trim();
 
-// Funciones de acceso global (opcional, si quieres seguir declarando)
-window.alumnosModule = {
-    guardarAlumno: window.guardarAlumno,
-    editarAlumno: window.editarAlumno,
-    confirmarEliminarAlumno: window.confirmarEliminarAlumno,
-    cargarListaAlumnos: window.cargarListaAlumnos,
-    filtrarAlumnos: window.filtrarAlumnos,
-    mostrarFichaAlumno: window.mostrarFichaAlumno,
-    cargarCandidatosExamen: window.cargarCandidatosExamen,
-    filtrarCandidatos: window.filtrarCandidatos
+    if (!numero || !nombre || !apellido) {
+        window.mostrarNotificacion("Por favor, rellena todos los campos", "error");
+        return;
+    }
+
+    const nuevoAlumno = {
+        id: Date.now(),
+        numero,
+        nombre,
+        apellido,
+        simulacros: []
+    };
+
+    window.alumnos.push(nuevoAlumno);
+    localStorage.setItem('alumnos', JSON.stringify(window.alumnos));
+
+    window.mostrarNotificacion("Alumno guardado correctamente", "exito");
+    window.mostrarPantalla('pantalla-menu');
 };
 
+window.cargarAlumnosDesdeStorage = function() {
+    const datos = localStorage.getItem('alumnos');
+    if (datos) {
+        window.alumnos = JSON.parse(datos);
+    }
+};
+
+window.obtenerAlumnoPorId = function(id) {
+    return window.alumnos.find(alumno => alumno.id === id);
+};
+
+window.actualizarAlumno = function(id, datosActualizados) {
+    const index = window.alumnos.findIndex(alumno => alumno.id === id);
+    if (index !== -1) {
+        window.alumnos[index] = { ...window.alumnos[index], ...datosActualizados };
+        localStorage.setItem('alumnos', JSON.stringify(window.alumnos));
+        window.mostrarNotificacion("Alumno actualizado", "exito");
+    } else {
+        window.mostrarNotificacion("Alumno no encontrado", "error");
+    }
+};
+
+// Cargar los alumnos al iniciar
+window.cargarAlumnosDesdeStorage();
