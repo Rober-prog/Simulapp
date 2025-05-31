@@ -30,14 +30,14 @@ function guardarAlumno() {
     }
 
     // Validate name length
-    if (nombre.length > 24) {
+    if (nombre.length > 26) {
         mostrarNotificacion('El nombre debe tener como máximo 24 caracteres', 'advertencia');
         nombreInput.focus();
         return;
     }
 
     // Validate surname length
-    if (apellido.length > 24) {
+    if (apellido.length > 26) {
         mostrarNotificacion('El apellido debe tener como máximo 24 caracteres', 'advertencia');
         apellidoInput.focus();
         return;
