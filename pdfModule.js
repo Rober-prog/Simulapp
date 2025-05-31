@@ -139,7 +139,7 @@ function exportarFichaAlumno() {
         // Clean up
         setTimeout(() => URL.revokeObjectURL(pdfUrl), 100);
         
-        mostrarNotificacionWebView('Informe PDF creado');
+        mostrarNotificacionWebView('PDF guardado en documentos');
     } catch (error) {
         console.error('Error generando PDF:', error);
         mostrarNotificacionWebView('Error al generar el PDF');
