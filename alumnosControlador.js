@@ -30,7 +30,7 @@ function guardarAlumno() {
     }
 
     // Validate name length
-    if (nombre.length > 26) {
+    if (nombre.length > 26.test(nombre)) {
         mostrarNotificacion('El nombre debe tener como máximo 26 caracteres', 'advertencia');
         nombreInput.focus();
         return;
