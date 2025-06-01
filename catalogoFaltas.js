@@ -235,7 +235,7 @@ const FALTAS_PREDETERMINADAS = [
     { id: 'e38', codigo: '11.5.4', descripcion: 'Circular o atravesar por la izquierda de un cebreado que separa sentidos opuestos', tipo: 'eliminatoria'},
     { id: 'e39', codigo: '11.5.5', descripcion: 'Incumplir líneas amarillas contínua, discontínua o zig-zag', tipo: 'eliminatoria'},
     { id: 'e40', codigo: '12.1', descripcion: 'Circular negligentemente por no usar alumbrado correspondiente', tipo: 'eliminatoria'},
-    { id: 'e41', codigo: '12.4', descripcion: 'Usar luz de carretera deslumbrando, causando peligro'},
+    { id: 'e41', codigo: '12.4', descripcion: 'Usar luz de carretera deslumbrando, causando peligro', tipo: 'eliminatoria'},
     { id: 'e42', codigo: '12.5', descripcion: 'No usar luz antiniebla trasera cuando sea obligatoria, causando peligro', tipo: 'eliminatoria'},
     { id: 'e43', codigo: '14.1', descripcion: 'No usar limpiaparabrisas cuando sea imprescindible', tipo: 'eliminatoria'},
     { id: 'e44', codigo: '14.2', descripcion: 'No usar el claxón cuando sea necesario', tipo: 'eliminatoria'},
